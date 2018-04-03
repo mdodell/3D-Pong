@@ -16,9 +16,8 @@ Professor Hickey
 	var loseScene, loseCamera, loseText; //Lose objects
 
 	var controls =
-	     {fwd:false, bwd:false, left:false, right:false,
-				speed:10, fly:false, reset:false, leftCamera:false, rightCamera: false, flipPlayer: false,
-		    camera:false};
+	     {p1Left:false, p1Right:false, p2IsCPU:true, p2Left:false, p2Right:false,
+				ballSpeed:10, p1PaddleSpeed:10, p2PaddleSpeed:10, reset:false, camera:false};
 	var gameInfo =
 	     {p1Score:0, p2Score:0, scene:'main', camera:'none'};
 
@@ -144,6 +143,13 @@ Professor Hickey
 		mesh = new Physijs.BoxMesh( geometry, material );
 		mesh.castShadow = true;
 		return mesh;
+	}
+
+	function createBoard(x, y, z, color){
+		var geometry = new THREE.PlaneGeometry(x, y, z);
+		var material = new THREE.MeshBasicMaterial ({color: color, side: THREE.DoubleSide});
+		var plane = new THREE.Mesh(geomtry, material);
+		scene.add(plane);
 	}
 
 	function animate() {
