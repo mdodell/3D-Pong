@@ -161,6 +161,7 @@ Professor Hickey
 		var geometry = new THREE.PlaneGeometry(x, y, z);
 		var material = new THREE.MeshBasicMaterial ({color: color, side: THREE.DoubleSide});
 		var plane = new THREE.Mesh(geometry, material);
+		plane.rotateX(Math.PI/2);
 		return plane;
 	}
 
