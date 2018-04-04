@@ -7,7 +7,7 @@ Professor Hickey
 
 	var scene, renderer, clock;  //Components to render the scene
 
-	var birdsEyeCamera, p1Camera, p2Camera;  //Cameras
+	var camera, p1Camera, p2Camera;  //Cameras
 
 	var p1, p2; //The two players
 
