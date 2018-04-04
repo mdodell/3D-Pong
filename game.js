@@ -17,9 +17,9 @@ Professor Hickey
 
 	var controls =
 	     {p1Left:false, p1Right:false, p2IsCPU:true, p2Left:false, p2Right:false,
-				ballSpeed:10, p1PaddleSpeed:10, p2PaddleSpeed:10, reset:false, camera:false};
+				ballSpeed:10, p1PaddleSpeed:10, p2PaddleSpeed:10, reset:false, camera:false}
 	var gameInfo =
-	     {p1Score:0, p2Score:0, scene:'main', camera:'none', difficulty:'medium'};
+	     {p1Score:0, p2Score:0, scene:'main', camera:'none', difficulty:'medium'}
 
 	init();
 	initControls();
@@ -62,11 +62,50 @@ Professor Hickey
 			camera.lookAt(0,0,0);
 
 
+
 			gameInfo.camera = camera;
 
-			var gameBoard = createBoard(20, 2, 100, 0xffffff);
+			var gameBoard = createBoard(200, 100, 1, new THREE.Color('green'));
 			scene.add(gameBoard);
 			gameBoard.position.set(0,0,0);
+
+			var side1 = boxMesh(200,20,1, 0xffffff);
+			scene.add(side1);
+			side1.position.set(0,10,-50);
+
+
+			var side2 = boxMesh(200,20,1, 0xffffff);
+			scene.add(side2);
+			side2.position.set(0,10,50);
+
+			var goal1 = boxMesh(1,20,100, 0xff00ff);
+			scene.add(goal1);
+			goal1.position.set(-100,10,0);
+
+			var goal2 = boxMesh(1,20,100, 0xff00ff);
+			scene.add(goal2);
+			goal2.position.set(100,10,0);
+
+			p1 = boxMesh(1,5,20, new THREE.Color('blue'));
+			scene.add(p1);
+			p1.position.set(-85,2.5,0);
+			p1 = new Physijs.BoxMesh(p1.geometry, p1.material);
+
+
+			p2 = boxMesh(1,5,20, new THREE.Color('red'));
+			scene.add(p2);
+			p2.position.set(85,2.5,0);
+			p1 = new Physijs.BoxMesh(p2.geometry, p2.material);
+
+			p1Camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			p1.add(p1Camera);
+			p1Camera.position.set(-14,3,0);
+			p1Camera.lookAt(85,0,0);
+
+			p2Camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			p2.add(p2Camera);
+			p2Camera.position.set(14,3,0);
+			p2Camera.lookAt(-85,0,0);
 
 	}
 
@@ -129,12 +168,18 @@ Professor Hickey
 	function keydown(event){
 		switch (event.key){
 			case "p": scene = initScene(); createMainScene(); console.log("Scene changed..."); break;
+			case "1": gameInfo.camera = p1Camera; break;
+			case "2": gameInfo.camera = p2Camera; break;
+			case "3": gameInfo.camera = camera; break;
+			case "a": controls.p1Left = true; break;
+			case "d": controls.p1Right = true; break;
 		}
 	}
 
 	function keyup(event){
 		switch (event.key){
-
+			case "a": controls.p1Left = false; break;
+			case "d": controls.p1Right = false; break;
 		}
 	}
 
@@ -150,16 +195,16 @@ Professor Hickey
 		return mesh;
 	}
 
-	function boxMesh(){
-		var geometry = new THREE.BoxGeometry(10,10,10);
-		var material = new THREE.MeshBasicMaterial({color: 0xffffff});
+	function boxMesh(x, y, z, color){
+		var geometry = new THREE.BoxGeometry(x,y,z);
+		var material = new THREE.MeshLambertMaterial({color: color});
 		var mesh = new THREE.Mesh(geometry, material);
 		return mesh;
 	}
 
 	function createBoard(x, y, z, color){
 		var geometry = new THREE.PlaneGeometry(x, y, z);
-		var material = new THREE.MeshBasicMaterial ({color: color, side: THREE.DoubleSide});
+		var material = new THREE.MeshLambertMaterial ({color: color, side: THREE.DoubleSide});
 		var plane = new THREE.Mesh(geometry, material);
 		plane.rotateX(Math.PI/2);
 		return plane;
@@ -177,6 +222,18 @@ Professor Hickey
 				scene.simulate();
 				if (gameInfo.camera != 'none'){
 					renderer.render(scene, gameInfo.camera);
+				}
+				if(controls.p1Left){
+					p1.__dirtyPosition = true;
+					p1.position.z += 1;
+					p1.position.x += 1;
+					console.log("changed" + p1.position.z);
+				}
+				if(controls.p1Right){
+					p1.__dirtyPosition = true;
+					p1.position.z += -1;
+					p1.position.x += -1;
+					console.log("changed" + p1.position.z);
 				}
 			  var info = document.getElementById("info");
 				break;
