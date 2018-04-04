@@ -19,7 +19,7 @@ Professor Hickey
 	     {p1Left:false, p1Right:false, p2IsCPU:true, p2Left:false, p2Right:false,
 				ballSpeed:10, p1PaddleSpeed:10, p2PaddleSpeed:10, reset:false, camera:false};
 	var gameInfo =
-	     {p1Score:0, p2Score:0, scene:'main', camera:'none'};
+	     {p1Score:0, p2Score:0, scene:'main', camera:'none', difficulty:'medium'};
 
 	init();
 	initControls();
@@ -51,18 +51,23 @@ Professor Hickey
       // setup lighting
 			gameInfo.scene = 'main';
 			var light1 = createPointLight();
-			light1.position.set(0,200,20);
+			light1.position.set(0,200,0);
 			scene.add(light1);
 			var light0 = new THREE.AmbientLight( 0xffffff,0.25);
 			scene.add(light0);
 
 			// create main camera
 			camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
-			camera.position.set(0,50,0);
+			camera.position.set(0,100,0);
 			camera.lookAt(0,0,0);
 
 
-			edgeCam = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			gameInfo.camera = camera;
+
+			var gameBoard = createBoard(20, 2, 100, 0xffffff);
+			scene.add(gameBoard);
+			gameBoard.position.set(0,0,0);
+
 	}
 
 
@@ -123,7 +128,7 @@ Professor Hickey
 
 	function keydown(event){
 		switch (event.key){
-
+			case "p": scene = initScene(); createMainScene(); console.log("Scene changed..."); break;
 		}
 	}
 
@@ -145,11 +150,18 @@ Professor Hickey
 		return mesh;
 	}
 
+	function boxMesh(){
+		var geometry = new THREE.BoxGeometry(10,10,10);
+		var material = new THREE.MeshBasicMaterial({color: 0xffffff});
+		var mesh = new THREE.Mesh(geometry, material);
+		return mesh;
+	}
+
 	function createBoard(x, y, z, color){
 		var geometry = new THREE.PlaneGeometry(x, y, z);
 		var material = new THREE.MeshBasicMaterial ({color: color, side: THREE.DoubleSide});
-		var plane = new THREE.Mesh(geomtry, material);
-		scene.add(plane);
+		var plane = new THREE.Mesh(geometry, material);
+		return plane;
 	}
 
 	function animate() {
@@ -161,16 +173,11 @@ Professor Hickey
 				break;
 
 			case "main":
-				// updateAvatar();
-				// updateNPC();
-				// scene.simulate();
-				// edgeCam.lookAt(avatar.position)
-				// if (gameInfo.camera!= 'none'){
-				// 	renderer.render( scene, gameInfo.camera );
-				// }
-				// var info = document.getElementById("info");
-				// elapsedTime = (new Date().getTime() - startDate.getTime()) / 1000;
-				// info.innerHTML='<div style="font-size:24pt">Score: ' + gameInfo.score + '&nbsp;&nbsp;Health: ' + gameInfo.health + '&nbsp;&nbsp;Time Taken: ' + parseInt(elapsedTime) + ' seconds&nbsp;&nbsp;&lt;/&gt; with &hearts; by Team 10</div>';
+				scene.simulate();
+				if (gameInfo.camera != 'none'){
+					renderer.render(scene, gameInfo.camera);
+				}
+			  var info = document.getElementById("info");
 				break;
 
 			case "youwon":
