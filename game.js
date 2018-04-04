@@ -226,13 +226,11 @@ Professor Hickey
 				if(controls.p1Left){
 					p1.__dirtyPosition = true;
 					p1.position.z += 1;
-					p1.position.x += 1;
 					console.log("changed" + p1.position.z);
 				}
 				if(controls.p1Right){
 					p1.__dirtyPosition = true;
 					p1.position.z += -1;
-					p1.position.x += -1;
 					console.log("changed" + p1.position.z);
 				}
 			  var info = document.getElementById("info");
