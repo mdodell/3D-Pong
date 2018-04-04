@@ -98,8 +98,7 @@ Professor Hickey
 			p1 = new Physijs.BoxMesh(p2.geometry, p2.material);
 
 			p1Camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
-			p1.add(p1Camera);
-			p1Camera.position.set(-14,3,0);
+			p1Camera.position.set(-99,5.5,0);
 			p1Camera.lookAt(85,0,0);
 
 			p2Camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
