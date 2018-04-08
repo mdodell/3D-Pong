@@ -11,6 +11,10 @@ Professor Hickey
 
 	var p1, p2; //The two players
 
+	var offsetVec1;
+
+	var side1, side2,gameBoard;
+
 	var introScene, introCamera, introText; //Intro objects
 	var winScene, winCamera, winText; //Win objects
 	var loseScene, loseCamera, loseText; //Lose objects
@@ -65,46 +69,73 @@ Professor Hickey
 
 			gameInfo.camera = camera;
 
-			var gameBoard = createBoard(200, 100, 1, new THREE.Color('green'));
+		 	gameBoard = createBoard(200, 100, 1, new THREE.Color('green'));
+			gameBoard = new Physijs.BoxMesh(gameBoard.geometry, gameBoard.material,0);
 			scene.add(gameBoard);
+			gameBoard.__dirtyRotation = true;
+			gameBoard.__dirtyPosition = true;
 			gameBoard.position.set(0,0,0);
+			gameBoard.rotation.set(Math.PI/2,0,0);
 
-			var side1 = boxMesh(200,20,1, 0xffffff);
+
+
+			side1 = boxMesh(200,20,1, 0xffffff);
+			side1 = new Physijs.BoxMesh(side1.geometry, side1.material,0);
 			scene.add(side1);
+			side1.__dirtyPosition = true;
 			side1.position.set(0,10,-50);
 
 
-			var side2 = boxMesh(200,20,1, 0xffffff);
+			side2 = boxMesh(200,20,1, 0xffffff);
+			side2 = new Physijs.BoxMesh(side2.geometry, side2.material,0);
 			scene.add(side2);
+			side2.__dirtyPosition = true;
 			side2.position.set(0,10,50);
 
-			var goal1 = boxMesh(1,20,100, 0xff00ff);
+			goal1 = boxMesh(1,20,100, 0xff00ff);
+			goal1 = new Physijs.BoxMesh(goal1.geometry, goal1.material,0);
 			scene.add(goal1);
+			goal1.__dirtyPosition = true;
 			goal1.position.set(-100,10,0);
 
-			var goal2 = boxMesh(1,20,100, 0xff00ff);
+			goal2 = boxMesh(1,20,100, 0xff00ff);
+			goal2 = new Physijs.BoxMesh(goal2.geometry, goal2.material,0);
 			scene.add(goal2);
+			goal2.__dirtyPosition = true;
 			goal2.position.set(100,10,0);
 
 			p1 = boxMesh(1,5,20, new THREE.Color('blue'));
 			p1 = new Physijs.BoxMesh(p1.geometry, p1.material);
 			scene.add(p1);
+			p1.__dirtyPosition = true;
 			p1.position.set(-85,2.5,0);
 
+			p1.addEventListener( 'collision',
+			function( other_object, relative_velocity, relative_rotation, contact_normal ) {
+				if (other_object==side1 || other_object==side2){
+					console.log("paddle hit the wall");
+					soundEffect('bad.wav');
+				}
+			}
+			)
 
 			p2 = boxMesh(1,5,20, new THREE.Color('red'));
 			p2 = new Physijs.BoxMesh(p2.geometry, p2.material);
 			scene.add(p2);
+			p2.__dirtyPosition = true;
 			p2.position.set(85,2.5,0);
 
+			offsetVec1 = new THREE.Vector3(-14,3,0);
+
 			p1Camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
-			p1Camera.position.set(-99,5.5,0);
-			p1Camera.lookAt(85,0,0);
+			//p1Camera.position.set(-99,5.5,0);
+			p1Camera.position.addVectors(p1.position,offsetVec1);
+			p1Camera.lookAt(p2.position.x,0,0);
 
 			p2Camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			p2.add(p2Camera);
 			p2Camera.position.set(14,3,0);
-			p2Camera.lookAt(-85,0,0);
+			p2Camera.lookAt(p1.position.x,0,0);
 
 	}
 
@@ -219,6 +250,9 @@ Professor Hickey
 				break;
 
 			case "main":
+				scene.simulate();
+				//update the p1 camera position using the current position of p1 and an offset vector
+				p1Camera.position.addVectors(p1.position,offsetVec1);
 
 				if (gameInfo.camera != 'none'){
 					renderer.render(scene, gameInfo.camera);
@@ -235,7 +269,7 @@ Professor Hickey
 				}
 			  var info = document.getElementById("info");
 				break;
-				scene.simulate();
+
 			case "youwon":
 				renderer.render(winScene, winCamera);
 				break;
