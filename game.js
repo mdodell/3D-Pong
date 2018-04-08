@@ -87,15 +87,15 @@ Professor Hickey
 			goal2.position.set(100,10,0);
 
 			p1 = boxMesh(1,5,20, new THREE.Color('blue'));
+			p1 = new Physijs.BoxMesh(p1.geometry, p1.material);
 			scene.add(p1);
 			p1.position.set(-85,2.5,0);
-			p1 = new Physijs.BoxMesh(p1.geometry, p1.material);
 
 
 			p2 = boxMesh(1,5,20, new THREE.Color('red'));
+			p2 = new Physijs.BoxMesh(p2.geometry, p2.material);
 			scene.add(p2);
 			p2.position.set(85,2.5,0);
-			p1 = new Physijs.BoxMesh(p2.geometry, p2.material);
 
 			p1Camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			p1Camera.position.set(-99,5.5,0);
@@ -143,6 +143,7 @@ Professor Hickey
 		document.body.appendChild( renderer.domElement );
 		renderer.shadowMap.enabled = true;
 		renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+		return renderer;
 	}
 
 
@@ -218,7 +219,7 @@ Professor Hickey
 				break;
 
 			case "main":
-				scene.simulate();
+
 				if (gameInfo.camera != 'none'){
 					renderer.render(scene, gameInfo.camera);
 				}
@@ -234,7 +235,7 @@ Professor Hickey
 				}
 			  var info = document.getElementById("info");
 				break;
-
+				scene.simulate();
 			case "youwon":
 				renderer.render(winScene, winCamera);
 				break;
