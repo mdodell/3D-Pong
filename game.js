@@ -211,8 +211,8 @@ Professor Hickey
 			case "1": gameInfo.camera = p1Camera; break;
 			case "2": gameInfo.camera = p2Camera; break;
 			case "3": gameInfo.camera = camera; break;
-			case "a": controls.p1Left = true; break;
-			case "d": controls.p1Right = true; break;
+			case "a": controls.p1Right = true; break;
+			case "d": controls.p1Left = true; break;
 			case "j": controls.p2Left = true; break;  // left arrow
 			case "l": controls.p2Right = true; break;  //right arrow
 		}
@@ -220,8 +220,8 @@ Professor Hickey
 
 	function keyup(event){
 		switch (event.key){
-			case "a": controls.p1Left = false; break;
-			case "d": controls.p1Right = false; break;
+			case "a": controls.p1Right = false; break;
+			case "d": controls.p1Left = false; break;
 			case "j": controls.p2Left = false; break;
 			case "l": controls.p2Right = false; break;
 		}
