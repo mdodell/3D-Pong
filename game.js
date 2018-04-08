@@ -125,6 +125,15 @@ Professor Hickey
 			p2.__dirtyPosition = true;
 			p2.position.set(85,2.5,0);
 
+			p2.addEventListener( 'collision',
+			function( other_object, relative_velocity, relative_rotation, contact_normal ) {
+				if (other_object==side1 || other_object==side2){
+					console.log("paddle hit the wall");
+					soundEffect('bad.wav');
+				}
+			}
+			)
+
 			offsetVec1 = new THREE.Vector3(-14,3,0);
 
 			p1Camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -204,6 +213,8 @@ Professor Hickey
 			case "3": gameInfo.camera = camera; break;
 			case "a": controls.p1Left = true; break;
 			case "d": controls.p1Right = true; break;
+			case "j": controls.p2Left = true; break;  // left arrow
+			case "l": controls.p2Right = true; break;  //right arrow
 		}
 	}
 
@@ -211,6 +222,8 @@ Professor Hickey
 		switch (event.key){
 			case "a": controls.p1Left = false; break;
 			case "d": controls.p1Right = false; break;
+			case "j": controls.p2Left = false; break;
+			case "l": controls.p2Right = false; break;
 		}
 	}
 
@@ -260,12 +273,22 @@ Professor Hickey
 				if(controls.p1Left){
 					p1.__dirtyPosition = true;
 					p1.position.z += 1;
-					console.log("changed" + p1.position.z);
+					console.log("changed1 " + p1.position.z);
 				}
 				if(controls.p1Right){
 					p1.__dirtyPosition = true;
 					p1.position.z += -1;
-					console.log("changed" + p1.position.z);
+					console.log("changed1 " + p1.position.z);
+				}
+				if(controls.p2Left){
+					p2.__dirtyPosition = true;
+					p2.position.z += 1;
+					console.log("changed2 " + p2.position.z);
+				}
+				if(controls.p2Right){
+					p2.__dirtyPosition = true;
+					p2.position.z += -1;
+					console.log("changed2 " + p2.position.z);
 				}
 			  var info = document.getElementById("info");
 				break;
