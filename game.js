@@ -23,7 +23,7 @@ Professor Hickey
 
 	var controls =
 	     {p1Left:false, p1Right:false, p2IsCPU:true, p2Left:false, p2Right:false,
-				ballSpeed:10, p1PaddleSpeed:10, p2PaddleSpeed:10, reset:false, camera:false}
+				ballSpeed:1, p1PaddleSpeed:10, p2PaddleSpeed:10, reset:false, camera:false}
 	var gameInfo =
 	     {p1Score:0, p2Score:0, scene:'main', camera:'none', difficulty:'medium'}
 
@@ -112,11 +112,23 @@ Professor Hickey
 			p1.__dirtyPosition = true;
 			p1.position.set(-85,2.5,0);
 
+			ball = createBall();
+		  scene.add(ball);
+			ball.__dirtyPosition = true;
+			ball.position.set(0, 2.5, 0);
+
 			p1.addEventListener( 'collision',
 			function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 				if (other_object==side1 || other_object==side2){
 					console.log("paddle hit the wall");
 					soundEffect('bad.wav');
+				}
+				if (other_object==ball){
+					console.log("paddle hit the ball");
+					soundEffect('good.wav');
+
+								ball.__dirtyPosition = true;
+								ball.position.set(0, 2.5, 0);
 				}
 			}
 			)
@@ -133,13 +145,29 @@ Professor Hickey
 					console.log("paddle hit the wall");
 					soundEffect('bad.wav');
 				}
+				if (other_object==ball){
+					console.log("paddle hit the ball");
+					//do something here
+				}
 			}
 		)
 
-			ball = createBall();
-			scene.add(ball);
-			ball.__dirtyPosition = true;
-			ball.position.set(0, 2.5, 0);
+		ball.addEventListener( 'collision',
+		function( other_object, relative_velocity, relative_rotation, contact_normal ) {
+			if (other_object==p1 || other_object==p2){
+				console.log("ball hit the paddle");
+			  ball.__dirtyPosition = true;
+
+			}
+			if (other_object==goal1 || other_object==goal2){
+				console.log("paddle hit the goal");
+				soundEffect('good.wav');
+				ball.__dirtyPosition = true;
+				ball.position.set(0, 2.5, 0);
+			}
+		}
+	)
+
 
 
 
@@ -278,6 +306,7 @@ Professor Hickey
     var mesh = new Physijs.BoxMesh( geometry, pmaterial );
 		mesh.setDamping(0.1,0.1);
 		mesh.castShadow = true;
+		mesh.setCcdSweptSphereRadius(0.2);
 		return mesh;
 	}
 
@@ -293,6 +322,8 @@ Professor Hickey
 				scene.simulate();
 				//update the p1 camera position using the current position of p1 and an offset vector
 				p1Camera.position.addVectors(p1.position,offsetVec1);
+
+
 
 				if (gameInfo.camera != 'none'){
 					renderer.render(scene, gameInfo.camera);
@@ -337,6 +368,11 @@ Professor Hickey
 					p2.position.y += -1;
 					console.log("changed2 " + p2.position.y);
 				}
+
+				ball.__dirtyPosition = true;
+				ball.position.x += 1;
+
+
 			  var info = document.getElementById("info");
 				break;
 
