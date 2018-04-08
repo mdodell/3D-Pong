@@ -11,6 +11,8 @@ Professor Hickey
 
 	var p1, p2; //The two players
 
+	var ball; //the ball
+
 	var offsetVec1;
 
 	var side1, side2,gameBoard;
@@ -132,7 +134,14 @@ Professor Hickey
 					soundEffect('bad.wav');
 				}
 			}
-			)
+		)
+
+			ball = createBall();
+			scene.add(ball);
+			ball.__dirtyPosition = true;
+			ball.position.set(0, 2.5, 0);
+
+
 
 			offsetVec1 = new THREE.Vector3(-14,3,0);
 
@@ -213,8 +222,12 @@ Professor Hickey
 			case "3": gameInfo.camera = camera; break;
 			case "a": controls.p1Right = true; break;
 			case "d": controls.p1Left = true; break;
-			case "j": controls.p2Left = true; break;  // left arrow
-			case "l": controls.p2Right = true; break;  //right arrow
+			case "w": controls.p1Up = true; break;
+			case "s": controls.p1Down = true; break;
+			case "j": controls.p2Left = true; break;
+			case "l": controls.p2Right = true; break;
+			case "i": controls.p2Up = true; break;
+			case "k": controls.p2Down = true; break;
 		}
 	}
 
@@ -222,8 +235,12 @@ Professor Hickey
 		switch (event.key){
 			case "a": controls.p1Right = false; break;
 			case "d": controls.p1Left = false; break;
+			case "w": controls.p1Up = false; break;
+			case "s": controls.p1Down = false; break;
 			case "j": controls.p2Left = false; break;
 			case "l": controls.p2Right = false; break;
+			case "i": controls.p2Up = false; break;
+			case "k": controls.p2Down = false; break;
 		}
 	}
 
@@ -254,6 +271,16 @@ Professor Hickey
 		return plane;
 	}
 
+	function createBall(){
+		var geometry = new THREE.SphereGeometry( 2, 200, 200);
+		var material = new THREE.MeshLambertMaterial( { color: 0x444444} );
+		var pmaterial = new Physijs.createMaterial(material,0.9,0.95);
+    var mesh = new Physijs.BoxMesh( geometry, pmaterial );
+		mesh.setDamping(0.1,0.1);
+		mesh.castShadow = true;
+		return mesh;
+	}
+
 	function animate() {
 		requestAnimationFrame( animate );
 
@@ -280,6 +307,16 @@ Professor Hickey
 					p1.position.z += -1;
 					console.log("changed1 " + p1.position.z);
 				}
+				if(controls.p1Up){
+					p1.__dirtyPosition = true;
+					p1.position.y += 1;
+					console.log("changed1 " + p1.position.y);
+				}
+				if(controls.p1Down){
+					p1.__dirtyPosition = true;
+					p1.position.y += -1;
+					console.log("changed1 " + p1.position.y);
+				}
 				if(controls.p2Left){
 					p2.__dirtyPosition = true;
 					p2.position.z += 1;
@@ -289,6 +326,16 @@ Professor Hickey
 					p2.__dirtyPosition = true;
 					p2.position.z += -1;
 					console.log("changed2 " + p2.position.z);
+				}
+				if(controls.p2Up){
+					p2.__dirtyPosition = true;
+					p2.position.y += 1;
+					console.log("changed2 " + p2.position.y);
+				}
+				if(controls.p2Down){
+					p2.__dirtyPosition = true;
+					p2.position.y += -1;
+					console.log("changed2 " + p2.position.y);
 				}
 			  var info = document.getElementById("info");
 				break;
