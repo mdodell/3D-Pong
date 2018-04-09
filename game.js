@@ -1,4 +1,3 @@
-
 /*
 Final Project MVP - 3D Pong
 By Team 10
@@ -30,8 +29,9 @@ Professor Hickey
 	init();
 	initControls();
 	animate();
-
+	
 	function createIntroScene(){
+		
 		introScene = initScene();
 		gameInfo.scene='intro';
 		introText = createImageMesh('Splash.png');
@@ -44,17 +44,16 @@ Professor Hickey
 		introCamera.rotation.y = Math.PI;
 		introCamera.lookAt(0,0,0);
 	}
-
+	
 	function init(){
-      initPhysijs();
-			scene = createIntroScene();
-			initRenderer();
+		initPhysijs();
+		scene = createIntroScene();
+		initRenderer();
 	}
-
 
 	function createMainScene(){
 
-      // setup lighting
+			// setup lighting
 			gameInfo.scene = 'main';
 			var light1 = createPointLight();
 			light1.position.set(0,200,0);
@@ -67,26 +66,22 @@ Professor Hickey
 			camera.position.set(0,100,0);
 			camera.lookAt(0,0,0);
 
-
-
 			gameInfo.camera = camera;
 
 		 	gameBoard = createBoard(200, 100, 1, new THREE.Color('green'));
 			gameBoard = new Physijs.BoxMesh(gameBoard.geometry, gameBoard.material,0);
+			gameBoard.visible = false;
 			scene.add(gameBoard);
 			gameBoard.__dirtyRotation = true;
 			gameBoard.__dirtyPosition = true;
 			gameBoard.position.set(0,0,0);
 			gameBoard.rotation.set(Math.PI/2,0,0);
 
-
-
 			side1 = boxMesh(200,20,1, 0xffffff);
 			side1 = new Physijs.BoxMesh(side1.geometry, side1.material,0);
 			scene.add(side1);
 			side1.__dirtyPosition = true;
 			side1.position.set(0,10,-50);
-
 
 			side2 = boxMesh(200,20,1, 0xffffff);
 			side2 = new Physijs.BoxMesh(side2.geometry, side2.material,0);
@@ -113,12 +108,13 @@ Professor Hickey
 			p1.position.set(-85,2.5,0);
 
 			ball = createBall();
-		  scene.add(ball);
+		    scene.add(ball);
 			ball.__dirtyPosition = true;
 			ball.position.set(0, 2.5, 0);
 
 			p1.addEventListener( 'collision',
 			function( other_object, relative_velocity, relative_rotation, contact_normal ) {
+				
 				if (other_object==side1 || other_object==side2){
 					console.log("paddle hit the wall");
 					soundEffect('bad.wav');
@@ -127,8 +123,9 @@ Professor Hickey
 					console.log("paddle hit the ball");
 					soundEffect('good.wav');
 
-								ball.__dirtyPosition = true;
-								ball.position.set(0, 2.5, 0);
+					// TODO: Needs to fly back
+					ball.__dirtyPosition = true;
+					ball.position.set(0, 2.5, 0);
 				}
 			}
 			)
@@ -141,35 +138,36 @@ Professor Hickey
 
 			p2.addEventListener( 'collision',
 			function( other_object, relative_velocity, relative_rotation, contact_normal ) {
+				
 				if (other_object==side1 || other_object==side2){
 					console.log("paddle hit the wall");
 					soundEffect('bad.wav');
 				}
 				if (other_object==ball){
 					console.log("paddle hit the ball");
-					//do something here
+					
+					// TODO: Needs to fly back
+					ball.__dirtyPosition = true;
+					ball.position.set(0, 2.5, 0);
 				}
 			}
 		)
 
 		ball.addEventListener( 'collision',
 		function( other_object, relative_velocity, relative_rotation, contact_normal ) {
-			if (other_object==p1 || other_object==p2){
-				console.log("ball hit the paddle");
-			  ball.__dirtyPosition = true;
+				if (other_object==p1 || other_object==p2){
+					console.log("ball hit the paddle");
+					ball.__dirtyPosition = true;
 
+				}
+				if (other_object==goal1 || other_object==goal2){
+					console.log("ball hit the goal");
+					soundEffect('good.wav');
+					ball.__dirtyPosition = true;
+					ball.position.set(0, 2.5, 0);
+				}
 			}
-			if (other_object==goal1 || other_object==goal2){
-				console.log("paddle hit the goal");
-				soundEffect('good.wav');
-				ball.__dirtyPosition = true;
-				ball.position.set(0, 2.5, 0);
-			}
-		}
-	)
-
-
-
+		)
 
 			offsetVec1 = new THREE.Vector3(-14,3,0);
 
@@ -184,7 +182,6 @@ Professor Hickey
 			p2Camera.lookAt(p1.position.x,0,0);
 
 	}
-
 
 	function soundEffect(file){
 		// create an AudioListener and add it to the camera
@@ -223,7 +220,6 @@ Professor Hickey
 		return renderer;
 	}
 
-
 	function createPointLight(){
 		var light = new THREE.PointLight(0xffffff);
 		light.castShadow = true;
@@ -235,23 +231,27 @@ Professor Hickey
 	}
 
 	function initControls(){
-			clock = new THREE.Clock();
-			clock.start();
+		clock = new THREE.Clock();
+		clock.start();
 
-			window.addEventListener('keydown', keydown);
-			window.addEventListener('keyup', keyup);
-  }
+		window.addEventListener('keydown', keydown);
+		window.addEventListener('keyup', keyup);
+	}
 
 	function keydown(event){
 		switch (event.key){
 			case "p": scene = initScene(); createMainScene(); console.log("Scene changed..."); break;
 			case "1": gameInfo.camera = p1Camera; break;
 			case "2": gameInfo.camera = p2Camera; break;
-			case "3": gameInfo.camera = camera; break;
+			case "3": gameInfo.camera = camera; break
+			
+			// Player 1 controls
 			case "a": controls.p1Right = true; break;
 			case "d": controls.p1Left = true; break;
 			case "w": controls.p1Up = true; break;
 			case "s": controls.p1Down = true; break;
+			
+			// Player 2 controls
 			case "j": controls.p2Left = true; break;
 			case "l": controls.p2Right = true; break;
 			case "i": controls.p2Up = true; break;
@@ -261,10 +261,13 @@ Professor Hickey
 
 	function keyup(event){
 		switch (event.key){
+			// Player 1 controls
 			case "a": controls.p1Right = false; break;
 			case "d": controls.p1Left = false; break;
 			case "w": controls.p1Up = false; break;
 			case "s": controls.p1Down = false; break;
+			
+			// Player 2 controls
 			case "j": controls.p2Left = false; break;
 			case "l": controls.p2Right = false; break;
 			case "i": controls.p2Up = false; break;
@@ -301,9 +304,9 @@ Professor Hickey
 
 	function createBall(){
 		var geometry = new THREE.SphereGeometry( 2, 200, 200);
-		var material = new THREE.MeshLambertMaterial( { color: 0x444444} );
+		var material = new THREE.MeshLambertMaterial( { color: 0xffffff} );
 		var pmaterial = new Physijs.createMaterial(material,0.9,0.95);
-    var mesh = new Physijs.BoxMesh( geometry, pmaterial );
+		var mesh = new Physijs.BoxMesh( geometry, pmaterial );
 		mesh.setDamping(0.1,0.1);
 		mesh.castShadow = true;
 		mesh.setCcdSweptSphereRadius(0.2);
@@ -322,8 +325,6 @@ Professor Hickey
 				scene.simulate();
 				//update the p1 camera position using the current position of p1 and an offset vector
 				p1Camera.position.addVectors(p1.position,offsetVec1);
-
-
 
 				if (gameInfo.camera != 'none'){
 					renderer.render(scene, gameInfo.camera);
@@ -372,8 +373,7 @@ Professor Hickey
 				ball.__dirtyPosition = true;
 				ball.position.x += 1;
 
-
-			  var info = document.getElementById("info");
+				var info = document.getElementById("info");
 				break;
 
 			case "youwon":
@@ -383,7 +383,6 @@ Professor Hickey
 			case "youlose":
 				renderer.render(loseScene, loseCamera);
 				break;
-
 
 			default:
 				console.log("Invalid state. Scene name selected: "+ gameInfo.scene);
