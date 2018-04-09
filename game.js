@@ -21,7 +21,7 @@ var winScene, winCamera, winText; //Win objects
 var loseScene, loseCamera, loseText; //Lose objects
 
 var controls =
-{p1Left:false, p1Right:false, p2IsCPU:true, p2Left:false, p2Right:false,
+{p1Fwd:false, p1Bwd:false, p1Left:false, p1Right:false, p2IsCPU:false, p2Fwd:false, p2Bwd:false, p2Left:false, p2Right:false,
 	ballSpeed:1, p1PaddleSpeed:10, p2PaddleSpeed:10, reset:false, camera:false}
 	var gameInfo =
 	{p1Score:0, p2Score:0, scene:'main', camera:'none', difficulty:'medium'}
@@ -104,7 +104,8 @@ var controls =
 		goal2.position.set(100,10,0);
 
 		p1 = boxMesh(1,5,20, new THREE.Color('blue'));
-		p1 = new Physijs.BoxMesh(p1.geometry, p1.material);
+		var p1material = new Physijs.createMaterial(p1.material,0.9,0.95);
+		p1 = new Physijs.BoxMesh(p1.geometry, p1material);
 		scene.add(p1);
 		p1.__dirtyPosition = true;
 		p1.position.set(-85,2.5,0);
@@ -123,14 +124,15 @@ var controls =
 				soundEffect('good.wav');
 
 				// TODO: Needs to fly back
-			  ball.__dirtyPosition = true;
-				ball.position.set(0, 2.5, 0);
+			  //ball.__dirtyPosition = true;
+				//ball.position.set(0, 2.5, 0);
 			}
 		}
 	)
 
 	p2 = boxMesh(1,5,20, new THREE.Color('red'));
-	p2 = new Physijs.BoxMesh(p2.geometry, p2.material);
+	var p2material = new Physijs.createMaterial(p2.material,0.9,0.95);
+	p2 = new Physijs.BoxMesh(p2.geometry, p2material);
 	scene.add(p2);
 	p2.__dirtyPosition = true;
 	p2.position.set(85,2.5,0);
@@ -143,11 +145,16 @@ var controls =
 			console.log("paddle hit the ball");
 
 			// TODO: Needs to fly back
-			ball.__dirtyPosition = true;
-			ball.position.set(0, 2.5, 0);
+			//ball.__dirtyPosition = true;
+			//ball.position.set(0, 2.5, 0);
 		}
 	}
 )
+p1.__dirtyPosition = true;
+p1.position.x = -85;
+
+p2.__dirtyPosition = true;
+p2.position.x = 85;
 
 ball.addEventListener( 'collision',
 function( other_object, relative_velocity, relative_rotation, contact_normal ) {
@@ -250,32 +257,32 @@ function keydown(event){
 			case "3": gameInfo.camera = camera; break
 
 			// Player 1 controls
-			case "a": controls.p1Right = true; break;
-			case "d": controls.p1Left = true; break;
-			case "w": controls.p1Up = true; break;
-			case "s": controls.p1Down = true; break;
+			case "s": controls.p1Left = true; break;
+			case "w": controls.p1Right = true; break;
+			case "d": controls.p1Fwd = true; break;
+			case "a": controls.p1Bwd = true; break;
 
 			// Player 2 controls
-			case "j": controls.p2Left = true; break;
-			case "l": controls.p2Right = true; break;
-			case "i": controls.p2Up = true; break;
-			case "k": controls.p2Down = true; break;
+			case "k": controls.p2Left = true; break;
+			case "i": controls.p2Right = true; break;
+			case "j": controls.p2Fwd = true; break;
+			case "l": controls.p2Bwd = true; break;
 		}
 }
 
 function keyup(event){
 	switch (event.key){
 		// Player 1 controls
-		case "a": controls.p1Right = false; break;
-		case "d": controls.p1Left = false; break;
-		case "w": controls.p1Up = false; break;
-		case "s": controls.p1Down = false; break;
+		case "s": controls.p1Left = false; break;
+		case "w": controls.p1Right = false; break;
+		case "d": controls.p1Fwd = false; break;
+		case "a": controls.p1Bwd = false; break;
 
 		// Player 2 controls
-		case "j": controls.p2Left = false; break;
-		case "l": controls.p2Right = false; break;
-		case "i": controls.p2Up = false; break;
-		case "k": controls.p2Down = false; break;
+		case "k": controls.p2Left = false; break;
+		case "i": controls.p2Right = false; break;
+		case "j": controls.p2Fwd = false; break;
+		case "l": controls.p2Bwd = false; break;
 	}
 }
 
@@ -309,7 +316,7 @@ function createBoard(x, y, z, color){
 function createBall(){
 	var geometry = new THREE.SphereGeometry( 2, 200, 200);
 	var material = new THREE.MeshLambertMaterial( { color: 0xffffff} );
-	var pmaterial = new Physijs.createMaterial(material,0.9,0.95);
+	var pmaterial = new Physijs.createMaterial(material,0.5,0.5);
 	var mesh = new Physijs.BoxMesh( geometry, pmaterial );
 	mesh.setDamping(0.1,0.1);
 	mesh.castShadow = true;
@@ -334,68 +341,69 @@ function animate() {
 			renderer.render(scene, gameInfo.camera);
 		}
 		if(controls.p1Left){
-			if(p1.position.z < 36){
+			if(p1.position.z < side2.position.z-10){
 			p1.__dirtyPosition = true;
 			p1.position.z += 1;
 			console.log("changed1 " + p1.position.z);
 		  }
 		}
 		if(controls.p1Right){
-			if(p1.position.z > -36){
+			if(p1.position.z > side1.position.z+10){
 			p1.__dirtyPosition = true;
-			p1.position.z += -1;
+			p1.position.z -= 1;
 			console.log("changed1 " + p1.position.z);
 		  }
 		}
-		if(controls.p1Up){
+		if(controls.p1Fwd){
+			if(p1.position.x < 0){
 			p1.__dirtyPosition = true;
-			p1.position.y += 1;
-			console.log("changed1 " + p1.position.y);
+			p1.position.x += 1;
+			console.log("changed1 " + p1.position.x);
+		  }
 		}
-		if(controls.p1Down){
+		if(controls.p1Bwd){
+			if(p1.position.x > goal1.position.x+10){
 			p1.__dirtyPosition = true;
-			p1.position.y += -1;
-			console.log("changed1 " + p1.position.y);
+			p1.position.x -= 1;
+			console.log("changed1 " + p1.position.x);
+		  }
 		}
 		if(controls.p2Left){
-			if(p2.position.z < 36){
+			if(p2.position.z < side2.position.z-10){
 			p2.__dirtyPosition = true;
 			p2.position.z += 1;
 			console.log("changed2 " + p2.position.z);
 		  }
 		}
 		if(controls.p2Right){
-			if(p2.position.z > -36){
+			if(p2.position.z > side1.position.z+10){
 			p2.__dirtyPosition = true;
-			p2.position.z += -1;
+			p2.position.z -= 1;
 			console.log("changed2 " + p2.position.z);
 		  }
 		}
-		if(controls.p2Up){
+		if(controls.p2Bwd){
+			if(goal2.position.x-10 > p2.position.x){
 			p2.__dirtyPosition = true;
-			p2.position.y += 1;
-			console.log("changed2 " + p2.position.y);
+			p2.position.x += 1;
+			console.log("changed2 " + p2.position.x);
+		  }
 		}
-		if(controls.p2Down){
+		if(controls.p2Fwd){
+			if(0 < p2.position.x){
 			p2.__dirtyPosition = true;
-			p2.position.y += -1;
-			console.log("changed2 " + p2.position.y);
+			p2.position.x -= 1;
+			console.log("changed2 " + p2.position.x);
+		  }
 		}
-
-		ball.__dirtyPosition = true;
-		ball.position.x += 1;
 
 		p2.__dirtyRotation = true;
 		p2.rotation.set(0, 0, 0);
 
-		p2.__dirtyPosition = true;
-		p2.position.x = 85;
-
 		p1.__dirtyRotation = true;
 		p1.rotation.set(0, 0, 0);
 
-		p1.__dirtyPosition = true;
-		p1.position.x = -85;
+
 
 		var info = document.getElementById("info");
 		info.innerHTML = '<div style="font-size:24pt">Blue Score: ' + gameInfo.p1Score + ' Red Score: '+ gameInfo.p2Score + '</div>';
