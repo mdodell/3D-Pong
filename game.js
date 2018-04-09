@@ -396,7 +396,7 @@ Professor Hickey
 				p1.position.x = -85
 				
 				var info = document.getElementById("info");
-				info.innerHTML = '<div style="font-size:24pt">Blue Score: ' + gameInfo.p1Score + 'Red Score: '+ gameInfo.p2Score + '</div>';
+				info.innerHTML = '<div style="font-size:24pt">Blue Score: ' + gameInfo.p1Score + ' Red Score: '+ gameInfo.p2Score + '</div>';
 				
 				break;
 
