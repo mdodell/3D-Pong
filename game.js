@@ -393,7 +393,7 @@ Professor Hickey
 				p1.rotation.set(0, 0, 0);
 				
 				p1.__dirtyPosition = true;
-				p1.position.x = -85
+				p1.position.x = -85;
 				
 				var info = document.getElementById("info");
 				info.innerHTML = '<div style="font-size:24pt">Blue Score: ' + gameInfo.p1Score + ' Red Score: '+ gameInfo.p2Score + '</div>';
