@@ -88,13 +88,15 @@ Professor Hickey
 			scene.add(side2);
 			side2.__dirtyPosition = true;
 			side2.position.set(0,10,50);
-
+			
+			// Blue side goal
 			goal1 = boxMesh(1,20,100, 0xff00ff);
 			goal1 = new Physijs.BoxMesh(goal1.geometry, goal1.material,0);
 			scene.add(goal1);
 			goal1.__dirtyPosition = true;
 			goal1.position.set(-100,10,0);
-
+			
+			// Red side goal
 			goal2 = boxMesh(1,20,100, 0xff00ff);
 			goal2 = new Physijs.BoxMesh(goal2.geometry, goal2.material,0);
 			scene.add(goal2);
@@ -160,11 +162,19 @@ Professor Hickey
 					ball.__dirtyPosition = true;
 
 				}
-				if (other_object==goal1 || other_object==goal2){
-					console.log("ball hit the goal");
+				if (other_object==goal1){
+					console.log("ball hit the goal 1");
 					soundEffect('good.wav');
 					ball.__dirtyPosition = true;
 					ball.position.set(0, 2.5, 0);
+					gameInfo.p1Score += 1;
+				}
+				if (other_object==goal2){
+					console.log("ball hit the goal 2");
+					soundEffect('good.wav');
+					ball.__dirtyPosition = true;
+					ball.position.set(0, 2.5, 0);
+					gameInfo.p2Score += 1;
 				}
 			}
 		)
@@ -237,7 +247,7 @@ Professor Hickey
 		window.addEventListener('keydown', keydown);
 		window.addEventListener('keyup', keyup);
 	}
-
+	
 	function keydown(event){
 		switch (event.key){
 			case "p": scene = initScene(); createMainScene(); console.log("Scene changed..."); break;
@@ -372,8 +382,10 @@ Professor Hickey
 
 				ball.__dirtyPosition = true;
 				ball.position.x += 1;
-
+				
 				var info = document.getElementById("info");
+				info.innerHTML = '<div style="font-size:24pt">Blue Score: ' + gameInfo.p1Score + 'Red Score: '+ gameInfo.p2Score + '</div>';
+				
 				break;
 
 			case "youwon":
@@ -388,3 +400,4 @@ Professor Hickey
 				console.log("Invalid state. Scene name selected: "+ gameInfo.scene);
 		}
 	}
+	
