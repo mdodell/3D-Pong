@@ -104,7 +104,7 @@ var controls =
 		goal2.position.set(100,10,0);
 
 		p1 = boxMesh(1,5,20, new THREE.Color('blue'));
-		var p1material = new Physijs.createMaterial(p1.material,0.9,0.95);
+		var p1material = new Physijs.createMaterial(p1.material,0.9,0);
 		p1 = new Physijs.BoxMesh(p1.geometry, p1material);
 		scene.add(p1);
 		p1.__dirtyPosition = true;
@@ -131,7 +131,7 @@ var controls =
 	)
 
 	p2 = boxMesh(1,5,20, new THREE.Color('red'));
-	var p2material = new Physijs.createMaterial(p2.material,0.9,0.95);
+	var p2material = new Physijs.createMaterial(p2.material,0.9,0);
 	p2 = new Physijs.BoxMesh(p2.geometry, p2material);
 	scene.add(p2);
 	p2.__dirtyPosition = true;
@@ -316,7 +316,7 @@ function createBoard(x, y, z, color){
 function createBall(){
 	var geometry = new THREE.SphereGeometry( 2, 200, 200);
 	var material = new THREE.MeshLambertMaterial( { color: 0xffffff} );
-	var pmaterial = new Physijs.createMaterial(material,0.5,0.5);
+	var pmaterial = new Physijs.createMaterial(material,0.05,0);
 	var mesh = new Physijs.BoxMesh( geometry, pmaterial );
 	mesh.setDamping(0.1,0.1);
 	mesh.castShadow = true;
@@ -396,14 +396,11 @@ function animate() {
 			console.log("changed2 " + p2.position.x);
 		  }
 		}
-
-		p2.__dirtyRotation = true;
-		p2.rotation.set(0, 0, 0);
-
 		p1.__dirtyRotation = true;
 		p1.rotation.set(0, 0, 0);
 
-
+		p2.__dirtyRotation = true;
+		p2.rotation.set(0, 0, 0);
 
 		var info = document.getElementById("info");
 		info.innerHTML = '<div style="font-size:24pt">Blue Score: ' + gameInfo.p1Score + ' Red Score: '+ gameInfo.p2Score + '</div>';
