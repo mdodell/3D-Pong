@@ -160,7 +160,7 @@ Professor Hickey
 				if (other_object==p1 || other_object==p2){
 					console.log("ball hit the paddle");
 					ball.__dirtyPosition = true;
-
+					
 				}
 				if (other_object==goal1){
 					console.log("ball hit the goal 1");
@@ -382,6 +382,18 @@ Professor Hickey
 
 				ball.__dirtyPosition = true;
 				ball.position.x += 1;
+				
+				p2.__dirtyRotation = true;
+				p2.rotation.set(0, 0, 0);
+				
+				p2.__dirtyPosition = true;
+				p2.position.x = 85;
+				
+				p1.__dirtyRotation = true;
+				p1.rotation.set(0, 0, 0);
+				
+				p1.__dirtyPosition = true;
+				p1.position.x = -85
 				
 				var info = document.getElementById("info");
 				info.innerHTML = '<div style="font-size:24pt">Blue Score: ' + gameInfo.p1Score + 'Red Score: '+ gameInfo.p2Score + '</div>';
