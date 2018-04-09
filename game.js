@@ -103,7 +103,7 @@ var controls =
 		goal2.__dirtyPosition = true;
 		goal2.position.set(100,10,0);
 
-		p1 = boxMesh(1,5,20, new THREE.Color('blue'));
+		p1 = boxMesh(5,5,20, new THREE.Color('blue'));
 		var p1material = new Physijs.createMaterial(p1.material,0.9,0);
 		p1 = new Physijs.BoxMesh(p1.geometry, p1material);
 		scene.add(p1);
@@ -130,7 +130,7 @@ var controls =
 		}
 	)
 
-	p2 = boxMesh(1,5,20, new THREE.Color('red'));
+	p2 = boxMesh(5,5,20, new THREE.Color('red'));
 	var p2material = new Physijs.createMaterial(p2.material,0.9,0);
 	p2 = new Physijs.BoxMesh(p2.geometry, p2material);
 	scene.add(p2);
