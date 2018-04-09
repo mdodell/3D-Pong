@@ -19,6 +19,7 @@ var side1, side2,gameBoard;
 var introScene, introCamera, introText; //Intro objects
 var winScene, winCamera, winText; //Win objects
 var loseScene, loseCamera, loseText; //Lose objects
+var endScene, endCamera, endText; //End objects
 
 var controls =
 {p1Fwd:false, p1Bwd:false, p1Left:false, p1Right:false, p2IsCPU:false, p2Fwd:false, p2Bwd:false, p2Left:false, p2Right:false,
@@ -43,6 +44,21 @@ var controls =
 		introCamera.position.set(0,0,-0.73);
 		introCamera.rotation.y = Math.PI;
 		introCamera.lookAt(0,0,0);
+	}
+
+	function createendScene(){
+
+		endScene = initScene();
+		gameInfo.scene='end';
+		endText = createImageMesh('endgame.png');
+		endScene.add(endText);
+		var light = createPointLight();
+		light.position.set(0,0,-1);
+		endScene.add(light);
+		endCamera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
+		endCamera.position.set(0,0,-0.73);
+		endCamera.rotation.y = Math.PI;
+		endCamera.lookAt(0,0,0);
 	}
 
 	function init(){
