@@ -21,7 +21,7 @@ var winScene, winCamera, winText; //Win objects
 var loseScene, loseCamera, loseText; //Lose objects
 
 var controls =
-{p1Left:false, p1Right:false, p1HittingWall:false, p2IsCPU:true, p2Left:false, p2Right:false, p2HittingWall:false,
+{p1Left:false, p1Right:false, p2IsCPU:true, p2Left:false, p2Right:false,
 	ballSpeed:1, p1PaddleSpeed:10, p2PaddleSpeed:10, reset:false, camera:false}
 	var gameInfo =
 	{p1Score:0, p2Score:0, scene:'main', camera:'none', difficulty:'medium'}
@@ -118,25 +118,13 @@ var controls =
 		p1.addEventListener( 'collision',
 		function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 
-			if (other_object==side1 || other_object==side2){
-				console.log("paddle hit the wall");
-				p1.__dirtyPosition = true;
-				if(other_object==side1){
-					p1.position.z += 5;
-				}
-				else if(other_object==side2){
-					p1.position.z -= 5;
-				}
-				controls.p1HittingWall = true;
-				soundEffect('bad.wav');
-			}
 			if (other_object==ball){
 				console.log("paddle hit the ball");
 				soundEffect('good.wav');
 
 				// TODO: Needs to fly back
-				//ball.__dirtyPosition = true;
-				//ball.position.set(0, 2.5, 0);
+			  ball.__dirtyPosition = true;
+				ball.position.set(0, 2.5, 0);
 			}
 		}
 	)
@@ -151,24 +139,12 @@ var controls =
 	p2.addEventListener( 'collision',
 	function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 
-		if (other_object==side1 || other_object==side2){
-			console.log("paddle hit the wall");
-			p2.__dirtyPosition = true;
-			if(other_object==side1){
-				p2.position.z += 5;
-			}
-			else if(other_object==side2){
-				p2.position.z -= 5;
-			}
-			controls.p2HittingWall = true;
-			soundEffect('bad.wav');
-		}
 		if (other_object==ball){
 			console.log("paddle hit the ball");
 
 			// TODO: Needs to fly back
-			//ball.__dirtyPosition = true;
-			//ball.position.set(0, 2.5, 0);
+			ball.__dirtyPosition = true;
+			ball.position.set(0, 2.5, 0);
 		}
 	}
 )
@@ -274,14 +250,14 @@ function keydown(event){
 			case "3": gameInfo.camera = camera; break
 
 			// Player 1 controls
-			case "a": controls.p1Right = !controls.p1HittingWall; break;
-			case "d": controls.p1Left = !controls.p1HittingWall; break;
+			case "a": controls.p1Right = true; break;
+			case "d": controls.p1Left = true; break;
 			case "w": controls.p1Up = true; break;
 			case "s": controls.p1Down = true; break;
 
 			// Player 2 controls
-			case "j": controls.p2Left = !controls.p2HittingWall; break;
-			case "l": controls.p2Right = !controls.p2HittingWall; break;
+			case "j": controls.p2Left = true; break;
+			case "l": controls.p2Right = true; break;
 			case "i": controls.p2Up = true; break;
 			case "k": controls.p2Down = true; break;
 		}
@@ -290,14 +266,14 @@ function keydown(event){
 function keyup(event){
 	switch (event.key){
 		// Player 1 controls
-		case "a": controls.p1Right = false; controls.p1HittingWall = false; break;
-		case "d": controls.p1Left = false; controls.p1HittingWall = false; break;
+		case "a": controls.p1Right = false; break;
+		case "d": controls.p1Left = false; break;
 		case "w": controls.p1Up = false; break;
 		case "s": controls.p1Down = false; break;
 
 		// Player 2 controls
-		case "j": controls.p2Left = false; controls.p2HittingWall = false; break;
-		case "l": controls.p2Right = false; controls.p2HittingWall = false; break;
+		case "j": controls.p2Left = false; break;
+		case "l": controls.p2Right = false; break;
 		case "i": controls.p2Up = false; break;
 		case "k": controls.p2Down = false; break;
 	}
@@ -358,14 +334,18 @@ function animate() {
 			renderer.render(scene, gameInfo.camera);
 		}
 		if(controls.p1Left){
+			if(p1.position.z < 36){
 			p1.__dirtyPosition = true;
 			p1.position.z += 1;
 			console.log("changed1 " + p1.position.z);
+		  }
 		}
 		if(controls.p1Right){
+			if(p1.position.z > -36){
 			p1.__dirtyPosition = true;
 			p1.position.z += -1;
 			console.log("changed1 " + p1.position.z);
+		  }
 		}
 		if(controls.p1Up){
 			p1.__dirtyPosition = true;
@@ -378,14 +358,18 @@ function animate() {
 			console.log("changed1 " + p1.position.y);
 		}
 		if(controls.p2Left){
+			if(p2.position.z < 36){
 			p2.__dirtyPosition = true;
 			p2.position.z += 1;
 			console.log("changed2 " + p2.position.z);
+		  }
 		}
 		if(controls.p2Right){
+			if(p2.position.z > -36){
 			p2.__dirtyPosition = true;
 			p2.position.z += -1;
 			console.log("changed2 " + p2.position.z);
+		  }
 		}
 		if(controls.p2Up){
 			p2.__dirtyPosition = true;
