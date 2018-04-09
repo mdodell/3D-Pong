@@ -53,6 +53,8 @@ var controls =
 
 	function createMainScene(){
 
+		scene.setGravity(new THREE.Vector3( 0, -1000, 0));
+
 		// setup lighting
 		gameInfo.scene = 'main';
 		var light1 = createPointLight();
