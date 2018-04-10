@@ -1,6 +1,6 @@
 /*
 Final Project MVP - 3D Pong
-By Team 10
+By Team 10 - Adam, Mitchell, Staci, Anthony, Zach, Devi
 Professor Hickey
 */
 
@@ -10,15 +10,14 @@ var camera, p1Camera, p2Camera;  //Cameras
 
 var p1, p2; //The two players
 
-var ball; //the ball
+var ball; //The ball
 
-var offsetVec1;
+var offsetVec1; //Vector for handling cameras
 
-var side1, side2,gameBoard;
+var side1, side2, gameBoard, gameCeiling; //Game borders
 
 var introScene, introCamera, introText; //Intro objects
-var winScene, winCamera, winText; //Win objects
-var loseScene, loseCamera, loseText; //Lose objects
+
 var endScene, endCamera, endText; //End objects
 
 var controls =
@@ -35,7 +34,7 @@ var controls =
 
 		introScene = initScene();
 		gameInfo.scene='intro';
-		introText = createImageMesh('Splash.png');
+		introText = createImageMesh('splash.png');
 		introScene.add(introText);
 		var light = createPointLight();
 		light.position.set(0,0,-1);
@@ -46,11 +45,17 @@ var controls =
 		introCamera.lookAt(0,0,0);
 	}
 
-	function createendScene(){
+	function createEndScene(p1Won){
 
 		endScene = initScene();
 		gameInfo.scene='end';
-		endText = createImageMesh('endgame.png');
+		if(p1Won){
+		endText = createImageMesh('p1win.png');
+		}
+		else{
+		endText = createImageMesh('p2win.png');
+		}
+		soundEffect('win.wav');
 		endScene.add(endText);
 		var light = createPointLight();
 		light.position.set(0,0,-1);
@@ -69,9 +74,6 @@ var controls =
 
 	function createMainScene(){
 
-		scene.setGravity(new THREE.Vector3( 0, -1000, 0));
-
-		// setup lighting
 		gameInfo.scene = 'main';
 		var light1 = createPointLight();
 		light1.position.set(0,200,0);
@@ -79,7 +81,6 @@ var controls =
 		var light0 = new THREE.AmbientLight( 0xffffff,0.25);
 		scene.add(light0);
 
-		// create main camera
 		camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
 		camera.position.set(0,100,0);
 		camera.lookAt(0,0,0);
@@ -94,6 +95,15 @@ var controls =
 		gameBoard.__dirtyPosition = true;
 		gameBoard.position.set(0,0,0);
 		gameBoard.rotation.set(Math.PI/2,0,0);
+
+		gameCeiling = createBoard(200, 100, 1, new THREE.Color('green'));
+		gameCeiling = new Physijs.BoxMesh(gameCeiling.geometry, gameCeiling.material,0);
+		gameCeiling.visible = false;
+		scene.add(gameCeiling);
+		gameCeiling.__dirtyRotation = true;
+		gameCeiling.__dirtyPosition = true;
+		gameCeiling.position.set(0,5,0);
+		gameCeiling.rotation.set(Math.PI/2,0,0);
 
 		side1 = boxMesh(200,20,1, 0xffffff);
 		side1 = new Physijs.BoxMesh(side1.geometry, side1.material,0);
@@ -138,12 +148,7 @@ var controls =
 		function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 
 			if (other_object==ball){
-				console.log("paddle hit the ball");
-				//soundEffect('good.wav');
-
-				// TODO: Needs to fly back
-			  //ball.__dirtyPosition = true;
-				//ball.position.set(0, 2.5, 0);
+				console.log("paddle1 hit the ball");
 			}
 		}
 	)
@@ -160,11 +165,7 @@ var controls =
 	function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 
 		if (other_object==ball){
-			console.log("paddle hit the ball");
-
-			// TODO: Needs to fly back
-			//ball.__dirtyPosition = true;
-			//ball.position.set(0, 2.5, 0);
+			console.log("paddle2 hit the ball");
 		}
 
 	}
@@ -179,8 +180,11 @@ ball.addEventListener( 'collision',
 function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 	if (other_object==p1 || other_object==p2){
 		console.log("ball hit the paddle");
-		ball.__dirtyPosition = true;
-
+		soundEffect('bounce.wav');
+	}
+	if (other_object==side1 || other_object==side2){
+		console.log("ball hit the side");
+		soundEffect('bounce.wav');
 	}
 	if (other_object==goal1){
 		console.log("ball hit the goal 1");
@@ -202,7 +206,6 @@ function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 offsetVec1 = new THREE.Vector3(-14,3,0);
 
 p1Camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
-//p1Camera.position.set(-99,5.5,0);
 p1Camera.position.addVectors(p1.position,offsetVec1);
 p1Camera.lookAt(p2.position.x,0,0);
 
@@ -214,14 +217,10 @@ p2Camera.lookAt(p1.position.x,0,0);
 }
 
 function soundEffect(file){
-	// create an AudioListener and add it to the camera
 	var listener = new THREE.AudioListener();
-	camera.add( listener );
+	camera.add(listener);
+	var sound = new THREE.Audio(listener);
 
-	// create a global audio source
-	var sound = new THREE.Audio( listener );
-
-	// load a sound and set it as the Audio object's buffer
 	var audioLoader = new THREE.AudioLoader();
 	audioLoader.load( '/sounds/'+file, function( buffer ) {
 		sound.setBuffer( buffer );
@@ -269,24 +268,24 @@ function initControls(){
 }
 
 function keydown(event){
-		switch (event.key){
-			case "p": scene = initScene(); createMainScene(); console.log("Scene changed..."); break;
-			case "1": gameInfo.camera = p1Camera; break;
-			case "2": gameInfo.camera = p2Camera; break;
-			case "3": gameInfo.camera = camera; break
+	switch (event.key){
+		case "p": scene = initScene(); createMainScene(); soundEffect('menuselect.wav'); console.log("Scene changed..."); break;
+		case "1": gameInfo.camera = p1Camera; break;
+		case "2": gameInfo.camera = p2Camera; break;
+		case "3": gameInfo.camera = camera; break
 
-			// Player 1 controls
-			case "s": controls.p1Left = true; break;
-			case "w": controls.p1Right = true; break;
-			case "d": controls.p1Fwd = true; break;
-			case "a": controls.p1Bwd = true; break;
+		// Player 1 controls
+		case "s": controls.p1Left = true; break;
+		case "w": controls.p1Right = true; break;
+		case "d": controls.p1Fwd = true; break;
+		case "a": controls.p1Bwd = true; break;
 
-			// Player 2 controls
-			case "k": controls.p2Left = true; break;
-			case "i": controls.p2Right = true; break;
-			case "j": controls.p2Fwd = true; break;
-			case "l": controls.p2Bwd = true; break;
-		}
+		// Player 2 controls
+		case "k": controls.p2Left = true; break;
+		case "i": controls.p2Right = true; break;
+		case "j": controls.p2Fwd = true; break;
+		case "l": controls.p2Bwd = true; break;
+	}
 }
 
 function keyup(event){
@@ -343,98 +342,124 @@ function createBall(){
 	return mesh;
 }
 
+function controlsHandling(){
+	if(controls.p1Left){
+		if(p1.position.z < side2.position.z-10){
+			p1.__dirtyPosition = true;
+			p1.position.z += 1;
+			console.log("changed1 " + p1.position.z);
+		}
+	}
+	if(controls.p1Right){
+		if(p1.position.z > side1.position.z+10){
+			p1.__dirtyPosition = true;
+			p1.position.z -= 1;
+			console.log("changed1 " + p1.position.z);
+		}
+	}
+	if(controls.p1Fwd){
+		if(p1.position.x < 0){
+			p1.__dirtyPosition = true;
+			p1.position.x += 1;
+			console.log("changed1 " + p1.position.x);
+		}
+	}
+	if(controls.p1Bwd){
+		if(p1.position.x > goal1.position.x+10){
+			p1.__dirtyPosition = true;
+			p1.position.x -= 1;
+			console.log("changed1 " + p1.position.x);
+		}
+	}
+	if(controls.p2Left){
+		if(p2.position.z < side2.position.z-10){
+			p2.__dirtyPosition = true;
+			p2.position.z += 1;
+			console.log("changed2 " + p2.position.z);
+		}
+	}
+	if(controls.p2Right){
+		if(p2.position.z > side1.position.z+10){
+			p2.__dirtyPosition = true;
+			p2.position.z -= 1;
+			console.log("changed2 " + p2.position.z);
+		}
+	}
+	if(controls.p2Bwd){
+		if(goal2.position.x-10 > p2.position.x){
+			p2.__dirtyPosition = true;
+			p2.position.x += 1;
+			console.log("changed2 " + p2.position.x);
+		}
+	}
+	if(controls.p2Fwd){
+		if(0 < p2.position.x){
+			p2.__dirtyPosition = true;
+			p2.position.x -= 1;
+			console.log("changed2 " + p2.position.x);
+		}
+	}
+	p1.__dirtyRotation = true;
+	p1.rotation.set(0, 0, 0);
+
+	p2.__dirtyRotation = true;
+	p2.rotation.set(0, 0, 0);
+}
+
+function outOfBoundsHandling(){
+	if(ball.position.y < -10){
+		ball.__dirtyPosition = true;
+		ball.position.y = 2;
+		console.log("Recovered ball from out of bounds");
+	}
+	if(p1.position.y < -10){
+		p1.__dirtyPosition = true;
+		p1.position.y = 2;
+		console.log("Recovered p1 from out of bounds");
+	}
+	if(p2.position.y < -10){
+		p2.__dirtyPosition = true;
+		p2.position.y = 2;
+		console.log("Recovered p2 from out of bounds");
+	}
+}
+
+function checkScore(){
+	if(gameInfo.p1Score == 10){
+		createEndScene(true);
+	}
+	else if(gameInfo.p2Score == 10){
+		createEndScene(false);
+	}
+}
+
 function animate() {
 	requestAnimationFrame( animate );
 
 	switch(gameInfo.scene) {
 		case "intro":
-		renderer.render(introScene, introCamera);
+			renderer.render(introScene, introCamera);
 		break;
 
 		case "main":
-		scene.simulate();
-		//update the p1 camera position using the current position of p1 and an offset vector
-		p1Camera.position.addVectors(p1.position,offsetVec1);
-
-		if (gameInfo.camera != 'none'){
-			renderer.render(scene, gameInfo.camera);
-		}
-		if(controls.p1Left){
-			if(p1.position.z < side2.position.z-10){
-			p1.__dirtyPosition = true;
-			p1.position.z += 1;
-			console.log("changed1 " + p1.position.z);
-		  }
-		}
-		if(controls.p1Right){
-			if(p1.position.z > side1.position.z+10){
-			p1.__dirtyPosition = true;
-			p1.position.z -= 1;
-			console.log("changed1 " + p1.position.z);
-		  }
-		}
-		if(controls.p1Fwd){
-			if(p1.position.x < 0){
-			p1.__dirtyPosition = true;
-			p1.position.x += 1;
-			console.log("changed1 " + p1.position.x);
-		  }
-		}
-		if(controls.p1Bwd){
-			if(p1.position.x > goal1.position.x+10){
-			p1.__dirtyPosition = true;
-			p1.position.x -= 1;
-			console.log("changed1 " + p1.position.x);
-		  }
-		}
-		if(controls.p2Left){
-			if(p2.position.z < side2.position.z-10){
-			p2.__dirtyPosition = true;
-			p2.position.z += 1;
-			console.log("changed2 " + p2.position.z);
-		  }
-		}
-		if(controls.p2Right){
-			if(p2.position.z > side1.position.z+10){
-			p2.__dirtyPosition = true;
-			p2.position.z -= 1;
-			console.log("changed2 " + p2.position.z);
-		  }
-		}
-		if(controls.p2Bwd){
-			if(goal2.position.x-10 > p2.position.x){
-			p2.__dirtyPosition = true;
-			p2.position.x += 1;
-			console.log("changed2 " + p2.position.x);
-		  }
-		}
-		if(controls.p2Fwd){
-			if(0 < p2.position.x){
-			p2.__dirtyPosition = true;
-			p2.position.x -= 1;
-			console.log("changed2 " + p2.position.x);
-		  }
-		}
-		p1.__dirtyRotation = true;
-		p1.rotation.set(0, 0, 0);
-
-		p2.__dirtyRotation = true;
-		p2.rotation.set(0, 0, 0);
-
-		var info = document.getElementById("info");
-		info.innerHTML = '<div style="font-size:24pt">Blue Score: ' + gameInfo.p1Score + ' Red Score: '+ gameInfo.p2Score + '</div>';
-
+			scene.simulate();
+			//update the p1 camera position using the current position of p1 and an offset vector
+			p1Camera.position.addVectors(p1.position,offsetVec1);
+			if (gameInfo.camera != 'none'){
+				renderer.render(scene, gameInfo.camera);
+			}
+			controlsHandling();
+			outOfBoundsHandling();
+			checkScore();
+			var info = document.getElementById("info");
+			info.innerHTML = '<div style="color: white; font-size:24pt; text-align: center; font-family: GameFont, sans-serif;">Blue Score: ' + gameInfo.p1Score + ' Red Score: '+ gameInfo.p2Score + '<br>Coded with <3 by Team 10</div>';
 		break;
 
-		case "youwon":
-		renderer.render(winScene, winCamera);
-		break;
-
-		case "youlose":
-		renderer.render(loseScene, loseCamera);
+		case "end":
+			renderer.render(endScene, endCamera);
 		break;
 
 		default:
-		console.log("Invalid state. Scene name selected: "+ gameInfo.scene);
+			console.log("Invalid state. Scene name selected: "+ gameInfo.scene);
 	}
 }
