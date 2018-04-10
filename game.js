@@ -139,7 +139,7 @@ var controls =
 
 			if (other_object==ball){
 				console.log("paddle hit the ball");
-				soundEffect('good.wav');
+				//soundEffect('good.wav');
 
 				// TODO: Needs to fly back
 			  //ball.__dirtyPosition = true;
@@ -166,6 +166,7 @@ var controls =
 			//ball.__dirtyPosition = true;
 			//ball.position.set(0, 2.5, 0);
 		}
+
 	}
 )
 p1.__dirtyPosition = true;
