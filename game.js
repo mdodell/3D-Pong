@@ -222,7 +222,7 @@ function soundEffect(file){
 	var sound = new THREE.Audio(listener);
 
 	var audioLoader = new THREE.AudioLoader();
-	audioLoader.load( '/sounds/'+file, function( buffer ) {
+	audioLoader.load( './sounds/'+file, function( buffer ) {
 		sound.setBuffer( buffer );
 		sound.setLoop( false );
 		sound.setVolume( 0.5 );
@@ -306,7 +306,7 @@ function keyup(event){
 
 function createImageMesh(image){
 	var geometry = new THREE.BoxGeometry( 1, 1, 1);
-	var texture = new THREE.TextureLoader().load( '../images/'+image );
+	var texture = new THREE.TextureLoader().load( './images/'+image );
 	texture.wrapS = THREE.RepeatWrapping;
 	texture.wrapT = THREE.RepeatWrapping;
 	texture.repeat.set( 1, 1 );
