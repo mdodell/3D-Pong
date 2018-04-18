@@ -137,7 +137,7 @@ var controls =
 		scene.add(p1);
 		p1.__dirtyPosition = true;
 		p1.position.set(-85,2.5,0);
-		p1.setCcdMotionThreshold(1);
+		p1.setCcdMotionThreshold(5);
 
 		ball = createBall();
 		scene.add(ball);
@@ -159,7 +159,7 @@ var controls =
 	scene.add(p2);
 	p2.__dirtyPosition = true;
 	p2.position.set(85,2.5,0);
-	p2.setCcdMotionThreshold(1);
+	p2.setCcdMotionThreshold(5);
 
 	p2.addEventListener( 'collision',
 	function( other_object, relative_velocity, relative_rotation, contact_normal ) {
@@ -334,7 +334,7 @@ function createBoard(x, y, z, color){
 function createBall(){
 	var geometry = new THREE.SphereGeometry( 2, 200, 200);
 	var material = new THREE.MeshLambertMaterial( { color: 0xffffff} );
-	var pmaterial = new Physijs.createMaterial(material,0.05,0);
+	var pmaterial = new Physijs.createMaterial(material,0.01,0);
 	var mesh = new Physijs.BoxMesh( geometry, pmaterial );
 	mesh.setDamping(0.1,0.1);
 	mesh.castShadow = true;
