@@ -22,6 +22,8 @@ var endScene, endCamera, endText; //End objects
 
 var gui; //A dat.gui
 
+
+
 var controls =
 {p1Fwd:false, p1Bwd:false, p1Left:false, p1Right:false, p2IsCPU:false, p2Fwd:false, p2Bwd:false, p2Left:false, p2Right:false,
 	ballSpeed:1, p1PaddleSpeed:10, p2PaddleSpeed:10, reset:false, camera:false}
@@ -190,11 +192,15 @@ ball.addEventListener( 'collision',
 function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 	if (other_object==p1 || other_object==p2){
 		console.log("ball hit the paddle");
-		soundEffect('bounce.wav');
+		var randomInt = getRandomIntInclusive(1,15);
+		console.log("Random sound is " + randomInt);
+		soundEffect(`${randomInt}.wav`);
 	}
 	if (other_object==side1 || other_object==side2){
 		console.log("ball hit the side");
-		soundEffect('bounce.wav');
+		var randomInt = getRandomIntInclusive(1,15);
+		console.log("Random sound is " + randomInt);
+		soundEffect(`${randomInt}.wav`);
 	}
 	if (other_object==goal1){
 		console.log("ball hit the goal 1");
@@ -224,6 +230,12 @@ p2.add(p2Camera);
 p2Camera.position.set(14,3,0);
 p2Camera.lookAt(p1.position.x,0,0);
 
+}
+
+function getRandomIntInclusive(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive
 }
 
 function soundEffect(file){
