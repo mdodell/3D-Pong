@@ -149,7 +149,7 @@ var controls =
 		scene.add(p1);
 		p1.__dirtyPosition = true;
 		p1.position.set(-85,2.5,0);
-		p1.setCcdMotionThreshold(5);
+		p1.setCcdMotionThreshold(20);
 
 		ball = createBall();
 		scene.add(ball);
@@ -171,7 +171,7 @@ var controls =
 	scene.add(p2);
 	p2.__dirtyPosition = true;
 	p2.position.set(85,2.5,0);
-	p2.setCcdMotionThreshold(5);
+	p2.setCcdMotionThreshold(20);
 
 	p2.addEventListener( 'collision',
 	function( other_object, relative_velocity, relative_rotation, contact_normal ) {
@@ -360,7 +360,8 @@ function createBall(){
 	var mesh = new Physijs.BoxMesh( geometry, pmaterial );
 	mesh.setDamping(0.1,0.1);
 	mesh.castShadow = true;
-	mesh.setCcdSweptSphereRadius(0.2);
+	mesh.setCcdMotionThreshold(2);
+	mesh.setCcdSweptSphereRadius(20);
 	return mesh;
 }
 
