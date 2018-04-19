@@ -149,7 +149,7 @@ var controls =
 		scene.add(p1);
 		p1.__dirtyPosition = true;
 		p1.position.set(-85,2.5,0);
-		p1.setCcdMotionThreshold(20);
+		p1.setCcdMotionThreshold(200);
 
 		ball = createBall();
 		scene.add(ball);
@@ -171,7 +171,7 @@ var controls =
 	scene.add(p2);
 	p2.__dirtyPosition = true;
 	p2.position.set(85,2.5,0);
-	p2.setCcdMotionThreshold(20);
+	p2.setCcdMotionThreshold(200);
 
 	p2.addEventListener( 'collision',
 	function( other_object, relative_velocity, relative_rotation, contact_normal ) {
@@ -192,15 +192,11 @@ ball.addEventListener( 'collision',
 function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 	if (other_object==p1 || other_object==p2){
 		console.log("ball hit the paddle");
-		var randomInt = getRandomIntInclusive(1,15);
-		console.log("Random sound is " + randomInt);
-		soundEffect(`${randomInt}.wav`);
+		soundEffect(`${getRandomIntInclusive(1,15)}.wav`);
 	}
 	if (other_object==side1 || other_object==side2){
 		console.log("ball hit the side");
-		var randomInt = getRandomIntInclusive(1,15);
-		console.log("Random sound is " + randomInt);
-		soundEffect(`${randomInt}.wav`);
+		soundEffect(`${getRandomIntInclusive(1,15)}.wav`);
 	}
 	if (other_object==goal1){
 		console.log("ball hit the goal 1");
@@ -357,11 +353,11 @@ function createBall(){
 	var geometry = new THREE.SphereGeometry( 2, 200, 200);
 	var material = new THREE.MeshLambertMaterial( { color: 0xffffff} );
 	var pmaterial = new Physijs.createMaterial(material,0.01,0);
-	var mesh = new Physijs.BoxMesh( geometry, pmaterial );
+	var mesh = new Physijs.SphereMesh( geometry, pmaterial );
 	mesh.setDamping(0.1,0.1);
 	mesh.castShadow = true;
-	mesh.setCcdMotionThreshold(2);
-	mesh.setCcdSweptSphereRadius(20);
+	mesh.setCcdMotionThreshold(200);
+	mesh.setCcdSweptSphereRadius(100);
 	return mesh;
 }
 
