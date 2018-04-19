@@ -14,17 +14,19 @@ var ball; //The ball
 
 var offsetVec1; //Vector for handling cameras
 
-var side1, side2, gameBoard, gameCeiling; //Game borders
+var side1, side2, goal1, goal2, gameBoard, gameCeiling; //Game borders
 
 var introScene, introCamera, introText; //Intro objects
 
 var endScene, endCamera, endText; //End objects
 
+var gui; //A dat.gui
+
 var controls =
 {p1Fwd:false, p1Bwd:false, p1Left:false, p1Right:false, p2IsCPU:false, p2Fwd:false, p2Bwd:false, p2Left:false, p2Right:false,
 	ballSpeed:1, p1PaddleSpeed:10, p2PaddleSpeed:10, reset:false, camera:false}
 	var gameInfo =
-	{p1Score:0, p2Score:0, scene:'main', camera:'none', difficulty:'medium'}
+	{p1Color:'#0000FF', p2Color:'#FF0000', ballColor:'#FFFFFF', goal1Color:'#FF00FF', goal2Color:'#FF00FF', p1Score:0, p2Score:0, scene:'main', camera:'none', difficulty:'medium', scoreThreshold:10}
 
 	init();
 	initControls();
@@ -73,7 +75,15 @@ var controls =
 	}
 
 	function createMainScene(){
-
+		if(gui == null){
+		gui = new dat.GUI();
+		gui.add(gameInfo, 'scoreThreshold', 1, 100).listen();
+		gui.addColor(gameInfo, 'p1Color').listen();
+		gui.addColor(gameInfo, 'p2Color').listen();
+		gui.addColor(gameInfo, 'ballColor').listen();
+		gui.addColor(gameInfo, 'goal1Color').listen();
+		gui.addColor(gameInfo, 'goal2Color').listen();
+		}
 		gameInfo.scene = 'main';
 		var light1 = createPointLight();
 		light1.position.set(0,200,0);
@@ -425,10 +435,10 @@ function outOfBoundsHandling(){
 }
 
 function checkScore(){
-	if(gameInfo.p1Score == 10){
+	if(gameInfo.p1Score == gameInfo.scoreThreshold){
 		createEndScene(true);
 	}
-	else if(gameInfo.p2Score == 10){
+	else if(gameInfo.p2Score == gameInfo.scoreThreshold){
 		createEndScene(false);
 	}
 }
@@ -447,6 +457,21 @@ function animate() {
 			p1Camera.position.addVectors(p1.position,offsetVec1);
 			if (gameInfo.camera != 'none'){
 				renderer.render(scene, gameInfo.camera);
+			}
+			if (gameInfo.p1Color.toLowerCase() != ("#"+p1.material.color.getHexString())){
+				p1.material.color.set(gameInfo.p1Color.toLowerCase());
+			}
+			if (gameInfo.p2Color.toLowerCase() != ("#"+p2.material.color.getHexString())){
+				p2.material.color.set(gameInfo.p2Color.toLowerCase());
+			}
+			if (gameInfo.goal1Color.toLowerCase() != ("#"+goal1.material.color.getHexString())){
+				goal1.material.color.set(gameInfo.goal1Color.toLowerCase());
+			}
+			if (gameInfo.goal2Color.toLowerCase() != ("#"+goal2.material.color.getHexString())){
+				goal2.material.color.set(gameInfo.goal2Color.toLowerCase());
+			}
+			if (gameInfo.ballColor.toLowerCase() != ("#"+ball.material.color.getHexString())){
+				ball.material.color.set(gameInfo.ballColor.toLowerCase());
 			}
 			controlsHandling();
 			outOfBoundsHandling();
