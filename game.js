@@ -26,7 +26,7 @@ var gui; //A dat.gui
 
 var controls =
 {p1Fwd:false, p1Bwd:false, p1Left:false, p1Right:false, p2IsCPU:false, p2Fwd:false, p2Bwd:false, p2Left:false, p2Right:false,
-	ballSpeed:1, p1PaddleSpeed:10, p2PaddleSpeed:10, reset:false, camera:false}
+	ballSpeed:1, p1PaddleSpeed:60, p2PaddleSpeed:60, reset:false, camera:false}
 	var gameInfo =
 	{p1Color:'#0000FF', p2Color:'#FF0000', ballColor:'#FFFFFF', goal1Color:'#FF00FF', goal2Color:'#FF00FF', p1Score:0, p2Score:0, scene:'main', camera:'none', difficulty:'medium', scoreThreshold:10}
 
@@ -54,10 +54,10 @@ var controls =
 		endScene = initScene();
 		gameInfo.scene='end';
 		if(p1Won){
-		endText = createImageMesh('p1win.png');
+			endText = createImageMesh('p1win.png');
 		}
 		else{
-		endText = createImageMesh('p2win.png');
+			endText = createImageMesh('p2win.png');
 		}
 		soundEffect('win.wav');
 		endScene.add(endText);
@@ -78,13 +78,13 @@ var controls =
 
 	function createMainScene(){
 		if(gui == null){
-		gui = new dat.GUI();
-		gui.add(gameInfo, 'scoreThreshold', 1, 100).listen();
-		gui.addColor(gameInfo, 'p1Color').listen();
-		gui.addColor(gameInfo, 'p2Color').listen();
-		gui.addColor(gameInfo, 'ballColor').listen();
-		gui.addColor(gameInfo, 'goal1Color').listen();
-		gui.addColor(gameInfo, 'goal2Color').listen();
+			gui = new dat.GUI();
+			gui.add(gameInfo, 'scoreThreshold', 1, 100).listen();
+			gui.addColor(gameInfo, 'p1Color').listen();
+			gui.addColor(gameInfo, 'p2Color').listen();
+			gui.addColor(gameInfo, 'ballColor').listen();
+			gui.addColor(gameInfo, 'goal1Color').listen();
+			gui.addColor(gameInfo, 'goal2Color').listen();
 		}
 		gameInfo.scene = 'main';
 		var light1 = createPointLight();
@@ -233,9 +233,9 @@ p2Camera.lookAt(p1.position.x,0,0);
 }
 
 function getRandomIntInclusive(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive
 }
 
 function soundEffect(file){
@@ -297,32 +297,32 @@ function keydown(event){
 		case "3": gameInfo.camera = camera; break
 
 		// Player 1 controls
-		case "s": controls.p1Left = true; break;
-		case "w": controls.p1Right = true; break;
-		case "d": controls.p1Fwd = true; break;
-		case "a": controls.p1Bwd = true; break;
+		case "d": controls.p1Left = true; break;
+		case "a": controls.p1Right = true; break;
+		case "s": controls.p1Fwd = true; break;
+		case "w": controls.p1Bwd = true; break;
 
 		// Player 2 controls
-		case "k": controls.p2Left = true; break;
-		case "i": controls.p2Right = true; break;
-		case "j": controls.p2Fwd = true; break;
-		case "l": controls.p2Bwd = true; break;
+		case "j": controls.p2Left = true; break;
+		case "l": controls.p2Right = true; break;
+		case "k": controls.p2Fwd = true; break;
+		case "i": controls.p2Bwd = true; break;
 	}
 }
 
 function keyup(event){
 	switch (event.key){
 		// Player 1 controls
-		case "s": controls.p1Left = false; break;
-		case "w": controls.p1Right = false; break;
-		case "d": controls.p1Fwd = false; break;
-		case "a": controls.p1Bwd = false; break;
+		case "d": controls.p1Left = false; p1.setLinearVelocity(new THREE.Vector3(0, p1.getWorldDirection().y, p1.getWorldDirection().z)); break;
+		case "a": controls.p1Right = false; p1.setLinearVelocity(new THREE.Vector3(0, p1.getWorldDirection().y, p1.getWorldDirection().z)); break;
+		case "s": controls.p1Fwd = false; p1.setLinearVelocity(new THREE.Vector3(p1.getWorldDirection().x, p1.getWorldDirection().y, 0)); break;
+		case "w": controls.p1Bwd = false; p1.setLinearVelocity(new THREE.Vector3(p1.getWorldDirection().x, p1.getWorldDirection().y, 0)); break;
 
 		// Player 2 controls
-		case "k": controls.p2Left = false; break;
-		case "i": controls.p2Right = false; break;
-		case "j": controls.p2Fwd = false; break;
-		case "l": controls.p2Bwd = false; break;
+		case "j": controls.p2Left = false; p2.setLinearVelocity(new THREE.Vector3(0, p2.getWorldDirection().y, p2.getWorldDirection().z)); break;
+		case "l": controls.p2Right = false; p2.setLinearVelocity(new THREE.Vector3(0, p2.getWorldDirection().y, p2.getWorldDirection().z)); break;
+		case "k": controls.p2Fwd = false; p2.setLinearVelocity(new THREE.Vector3(p2.getWorldDirection().x, p2.getWorldDirection().y, 0)); break;
+		case "i": controls.p2Bwd = false; p2.setLinearVelocity(new THREE.Vector3(p2.getWorldDirection().x, p2.getWorldDirection().y, 0)); break;
 	}
 }
 
@@ -366,65 +366,47 @@ function createBall(){
 }
 
 function controlsHandling(){
-	if(controls.p1Left){
-		if(p1.position.z < side2.position.z-10){
-			p1.__dirtyPosition = true;
-			p1.position.z += 1;
-			console.log("changed1 " + p1.position.z);
+	p1Direction = new THREE.Vector3(0,0,0);
+	if(controls.p1Fwd || controls.p1Bwd){
+		p1Direction = new THREE.Vector3(p1Direction.x, p1Direction.y, 1);
+		if (controls.p1Fwd){
+			p1.setLinearVelocity(new THREE.Vector3(p1Direction.x, p1Direction.y, p1Direction.z * controls.p1PaddleSpeed));
+		}
+		else if (controls.p1Bwd){
+			p1.setLinearVelocity(new THREE.Vector3(p1Direction.x, p1Direction.y, -p1Direction.z * controls.p1PaddleSpeed));
 		}
 	}
-	if(controls.p1Right){
-		if(p1.position.z > side1.position.z+10){
-			p1.__dirtyPosition = true;
-			p1.position.z -= 1;
-			console.log("changed1 " + p1.position.z);
+	if(controls.p1Left || controls.p1Right){
+		p1Direction = new THREE.Vector3(1, p1Direction.y, p1Direction.z);
+		if (controls.p1Left){
+			p1.setLinearVelocity(new THREE.Vector3(p1Direction.x * controls.p1PaddleSpeed, p1Direction.y, p1Direction.z));
 		}
-	}
-	if(controls.p1Fwd){
-		if(p1.position.x < 0){
-			p1.__dirtyPosition = true;
-			p1.position.x += 1;
-			console.log("changed1 " + p1.position.x);
-		}
-	}
-	if(controls.p1Bwd){
-		if(p1.position.x > goal1.position.x+10){
-			p1.__dirtyPosition = true;
-			p1.position.x -= 1;
-			console.log("changed1 " + p1.position.x);
-		}
-	}
-	if(controls.p2Left){
-		if(p2.position.z < side2.position.z-10){
-			p2.__dirtyPosition = true;
-			p2.position.z += 1;
-			console.log("changed2 " + p2.position.z);
-		}
-	}
-	if(controls.p2Right){
-		if(p2.position.z > side1.position.z+10){
-			p2.__dirtyPosition = true;
-			p2.position.z -= 1;
-			console.log("changed2 " + p2.position.z);
-		}
-	}
-	if(controls.p2Bwd){
-		if(goal2.position.x-10 > p2.position.x){
-			p2.__dirtyPosition = true;
-			p2.position.x += 1;
-			console.log("changed2 " + p2.position.x);
-		}
-	}
-	if(controls.p2Fwd){
-		if(0 < p2.position.x){
-			p2.__dirtyPosition = true;
-			p2.position.x -= 1;
-			console.log("changed2 " + p2.position.x);
+		else if (controls.p1Right){
+			p1.setLinearVelocity(new THREE.Vector3(-p1Direction.x * controls.p1PaddleSpeed, p1Direction.y, p1Direction.z));
 		}
 	}
 	p1.__dirtyRotation = true;
 	p1.rotation.set(0, 0, 0);
 
+	p2Direction = new THREE.Vector3(0,0,0);
+	if(controls.p2Fwd || controls.p2Bwd){
+		p2Direction = new THREE.Vector3(p2Direction.x, p2Direction.y, 1);
+		if (controls.p2Fwd){
+			p2.setLinearVelocity(new THREE.Vector3(p2Direction.x, p2Direction.y, p2Direction.z * controls.p2PaddleSpeed));
+		}
+		else if (controls.p2Bwd){
+			p2.setLinearVelocity(new THREE.Vector3(p2Direction.x, p2Direction.y, -p2Direction.z * controls.p2PaddleSpeed));
+		}
+	}
+	if(controls.p2Left || controls.p2Right){
+		p2Direction = new THREE.Vector3(1, p2Direction.y, p2Direction.z);
+		if (controls.p2Left){
+			p2.setLinearVelocity(new THREE.Vector3(-p2Direction.x * controls.p2PaddleSpeed, p2Direction.y, p2Direction.z));
+		}
+		else if (controls.p2Right){
+			p2.setLinearVelocity(new THREE.Vector3(p2Direction.x * controls.p2PaddleSpeed, p2Direction.y, p2Direction.z));
+		}
+	}
 	p2.__dirtyRotation = true;
 	p2.rotation.set(0, 0, 0);
 }
@@ -449,9 +431,11 @@ function outOfBoundsHandling(){
 
 function checkScore(){
 	if(gameInfo.p1Score == gameInfo.scoreThreshold){
+		console.log("check");
 		createEndScene(true);
 	}
 	else if(gameInfo.p2Score == gameInfo.scoreThreshold){
+		console.log("check");
 		createEndScene(false);
 	}
 }
@@ -461,43 +445,43 @@ function animate() {
 
 	switch(gameInfo.scene) {
 		case "intro":
-			renderer.render(introScene, introCamera);
+		renderer.render(introScene, introCamera);
 		break;
 
 		case "main":
-			scene.simulate();
-			//update the p1 camera position using the current position of p1 and an offset vector
-			p1Camera.position.addVectors(p1.position,offsetVec1);
-			if (gameInfo.camera != 'none'){
-				renderer.render(scene, gameInfo.camera);
-			}
-			if (gameInfo.p1Color.toLowerCase() != ("#"+p1.material.color.getHexString())){
-				p1.material.color.set(gameInfo.p1Color.toLowerCase());
-			}
-			if (gameInfo.p2Color.toLowerCase() != ("#"+p2.material.color.getHexString())){
-				p2.material.color.set(gameInfo.p2Color.toLowerCase());
-			}
-			if (gameInfo.goal1Color.toLowerCase() != ("#"+goal1.material.color.getHexString())){
-				goal1.material.color.set(gameInfo.goal1Color.toLowerCase());
-			}
-			if (gameInfo.goal2Color.toLowerCase() != ("#"+goal2.material.color.getHexString())){
-				goal2.material.color.set(gameInfo.goal2Color.toLowerCase());
-			}
-			if (gameInfo.ballColor.toLowerCase() != ("#"+ball.material.color.getHexString())){
-				ball.material.color.set(gameInfo.ballColor.toLowerCase());
-			}
-			controlsHandling();
-			outOfBoundsHandling();
-			checkScore();
-			var info = document.getElementById("info");
-			info.innerHTML = '<div style="color: white; font-size:24pt; text-align: center; font-family: GameFont, sans-serif;">Blue Score: ' + gameInfo.p1Score + ' Red Score: '+ gameInfo.p2Score + '<br>Coded with <3 by Team 10</div>';
+		scene.simulate();
+		//update the p1 camera position using the current position of p1 and an offset vector
+		p1Camera.position.addVectors(p1.position,offsetVec1);
+		if (gameInfo.camera != 'none'){
+			renderer.render(scene, gameInfo.camera);
+		}
+		if (gameInfo.p1Color.toLowerCase() != ("#"+p1.material.color.getHexString())){
+			p1.material.color.set(gameInfo.p1Color.toLowerCase());
+		}
+		if (gameInfo.p2Color.toLowerCase() != ("#"+p2.material.color.getHexString())){
+			p2.material.color.set(gameInfo.p2Color.toLowerCase());
+		}
+		if (gameInfo.goal1Color.toLowerCase() != ("#"+goal1.material.color.getHexString())){
+			goal1.material.color.set(gameInfo.goal1Color.toLowerCase());
+		}
+		if (gameInfo.goal2Color.toLowerCase() != ("#"+goal2.material.color.getHexString())){
+			goal2.material.color.set(gameInfo.goal2Color.toLowerCase());
+		}
+		if (gameInfo.ballColor.toLowerCase() != ("#"+ball.material.color.getHexString())){
+			ball.material.color.set(gameInfo.ballColor.toLowerCase());
+		}
+		controlsHandling();
+		outOfBoundsHandling();
+		checkScore();
+		var info = document.getElementById("info");
+		info.innerHTML = '<div style="color: white; font-size:24pt; text-align: center; font-family: GameFont, sans-serif;">Blue Score: ' + gameInfo.p1Score + ' Red Score: '+ gameInfo.p2Score + '<br>Coded with <3 by Team 10</div>';
 		break;
 
 		case "end":
-			renderer.render(endScene, endCamera);
+		renderer.render(endScene, endCamera);
 		break;
 
 		default:
-			console.log("Invalid state. Scene name selected: "+ gameInfo.scene);
+		console.log("Invalid state. Scene name selected: "+ gameInfo.scene);
 	}
 }
