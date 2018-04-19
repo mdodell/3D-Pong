@@ -26,7 +26,7 @@ var gui; //A dat.gui
 
 var controls =
 {p1Fwd:false, p1Bwd:false, p1Left:false, p1Right:false, p2IsCPU:false, p2Fwd:false, p2Bwd:false, p2Left:false, p2Right:false,
-	ballSpeed:1, p1PaddleSpeed:60, p2PaddleSpeed:60, reset:false, camera:false}
+	p1PaddleSpeed:60, p2PaddleSpeed:60, reset:false, camera:false}
 	var gameInfo =
 	{p1Color:'#0000FF', p2Color:'#FF0000', ballColor:'#FFFFFF', goal1Color:'#FF00FF', goal2Color:'#FF00FF', p1Score:0, p2Score:0, scene:'main', camera:'none', difficulty:'medium', scoreThreshold:10}
 
@@ -41,8 +41,8 @@ var controls =
 		introText = createImageMesh('splash.png');
 		introScene.add(introText);
 		var light = createPointLight();
-		light.position.set(0,0,-1);
-		introScene.add(light);
+		introText.add(light);
+		light.position.set(0,0,-5);
 		introCamera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
 		introCamera.position.set(0,0,-0.73);
 		introCamera.rotation.y = Math.PI;
@@ -62,8 +62,8 @@ var controls =
 		soundEffect('win.wav');
 		endScene.add(endText);
 		var light = createPointLight();
-		light.position.set(0,0,-1);
-		endScene.add(light);
+		endText.add(light);
+		light.position.set(0,0,-5);
 		endCamera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
 		endCamera.position.set(0,0,-0.73);
 		endCamera.rotation.y = Math.PI;
@@ -80,6 +80,8 @@ var controls =
 		if(gui == null){
 			gui = new dat.GUI();
 			gui.add(gameInfo, 'scoreThreshold', 1, 100).listen();
+			gui.add(controls, 'p1PaddleSpeed', 1, 90).listen();
+			gui.add(controls, 'p2PaddleSpeed', 1, 90).listen();
 			gui.addColor(gameInfo, 'p1Color').listen();
 			gui.addColor(gameInfo, 'p2Color').listen();
 			gui.addColor(gameInfo, 'ballColor').listen();
@@ -426,11 +428,11 @@ function outOfBoundsHandling(){
 }
 
 function checkScore(){
-	if(gameInfo.p1Score == gameInfo.scoreThreshold){
+	if(gameInfo.p1Score == Math.round(gameInfo.scoreThreshold)){
 		console.log("check");
 		createEndScene(true);
 	}
-	else if(gameInfo.p2Score == gameInfo.scoreThreshold){
+	else if(gameInfo.p2Score == Math.round(gameInfo.scoreThreshold)){
 		console.log("check");
 		createEndScene(false);
 	}
