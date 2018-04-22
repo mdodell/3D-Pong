@@ -103,7 +103,6 @@ var controls =
 
 		gameBoard = createBoard(200, 100, 1, new THREE.Color('green'));
 		gameBoard = new Physijs.BoxMesh(gameBoard.geometry, gameBoard.material,0);
-		gameBoard.visible = false;
 		scene.add(gameBoard);
 		gameBoard.__dirtyRotation = true;
 		gameBoard.__dirtyPosition = true;
@@ -345,7 +344,8 @@ function boxMesh(x, y, z, color){
 
 function createBoard(x, y, z, color){
 	var geometry = new THREE.PlaneGeometry(x, y, z);
-	var material = new THREE.MeshLambertMaterial ({color: color, side: THREE.DoubleSide});
+	var texture = new THREE.TextureLoader().load("./textures/pokemonfield.png" );
+	var material = new THREE.MeshLambertMaterial ({color: color, map: texture, side:THREE.DoubleSide});
 	var plane = new THREE.Mesh(geometry, material);
 	plane.rotateX(Math.PI/2);
 	return plane;
@@ -353,7 +353,8 @@ function createBoard(x, y, z, color){
 
 function createBall(){
 	var geometry = new THREE.SphereGeometry( 2, 200, 200);
-	var material = new THREE.MeshLambertMaterial( { color: 0xffffff} );
+	var texture = new THREE.TextureLoader().load("./textures/pokeball.png" );
+	var material = new THREE.MeshLambertMaterial( { color: 0xffffff, map: texture} );
 	var pmaterial = new Physijs.createMaterial(material,0.01,0);
 	var mesh = new Physijs.SphereMesh( geometry, pmaterial );
 	mesh.setDamping(0.1,0.1);
