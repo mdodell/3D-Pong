@@ -28,7 +28,7 @@ var controls =
 {p1Fwd:false, p1Bwd:false, p1Left:false, p1Right:false, p2IsCPU:false, p2Fwd:false, p2Bwd:false, p2Left:false, p2Right:false,
 	p1PaddleSpeed:60, p2PaddleSpeed:60, reset:false, camera:false}
 	var gameInfo =
-	{p1Color:'#0000FF', p2Color:'#FF0000', ballColor:'#FFFFFF', goal1Color:'#FF00FF', goal2Color:'#FF00FF', p1Score:0, p2Score:0, scene:'main', camera:'none', difficulty:'medium', scoreThreshold:10}
+	{p1Color:'#0000FF', p2Color:'#FF0000', ballColor:'#FFFFFF', goal1Color:'#FF00FF', goal2Color:'#FF00FF', gameBoardColor:'#FFFFFF', p1Texture:'', p2Texture:'', ballTexture:'', goal1Texture:'', goal2Texture:'', gameBoardTexture:'', lastP1Texture:'', lastP2Texture:'', lastBallTexture:'', lastGoal1Texture:'', lastGoal2Texture:'', lastGameBoardTexture:'', p1Score:0, p2Score:0, scene:'main', camera:'none', difficulty:'medium', scoreThreshold:10}
 
 	init();
 	initControls();
@@ -87,6 +87,13 @@ var controls =
 			gui.addColor(gameInfo, 'ballColor').listen();
 			gui.addColor(gameInfo, 'goal1Color').listen();
 			gui.addColor(gameInfo, 'goal2Color').listen();
+			gui.addColor(gameInfo, 'gameBoardColor').listen();
+			gui.add(gameInfo, 'p1Texture').listen();
+			gui.add(gameInfo, 'p2Texture').listen();
+			gui.add(gameInfo, 'ballTexture').listen();
+			gui.add(gameInfo, 'goal1Texture').listen();
+			gui.add(gameInfo, 'goal2Texture').listen();
+			gui.add(gameInfo, 'gameBoardTexture').listen();
 		}
 		gameInfo.scene = 'main';
 		var light1 = createPointLight();
@@ -107,7 +114,7 @@ var controls =
 		gameBoard.__dirtyRotation = true;
 		gameBoard.__dirtyPosition = true;
 		gameBoard.position.set(0,0,0);
-		gameBoard.rotation.set(Math.PI/2,0,0);
+		gameBoard.rotation.set(Math.PI/2,0,Math.PI);
 
 		gameCeiling = createBoard(200, 100, 1, new THREE.Color('green'));
 		gameCeiling = new Physijs.BoxMesh(gameCeiling.geometry, gameCeiling.material,0);
@@ -203,6 +210,7 @@ function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 		console.log("ball hit the goal 1");
 		soundEffect('good.wav');
 		ball.__dirtyPosition = true;
+		ball.setLinearVelocity(new THREE.Vector3(0,0,0));
 		ball.position.set(0, 2.5, 0);
 		gameInfo.p1Score += 1;
 	}
@@ -210,6 +218,7 @@ function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 		console.log("ball hit the goal 2");
 		soundEffect('good.wav');
 		ball.__dirtyPosition = true;
+		ball.setLinearVelocity(new THREE.Vector3(0,0,0));
 		ball.position.set(0, 2.5, 0);
 		gameInfo.p2Score += 1;
 	}
@@ -439,6 +448,58 @@ function checkScore(){
 	}
 }
 
+function colorChanges(){
+	if (gameInfo.p1Color.toLowerCase() != ("#"+p1.material.color.getHexString())){
+		p1.material.color.set(gameInfo.p1Color.toLowerCase());
+	}
+	if (gameInfo.p2Color.toLowerCase() != ("#"+p2.material.color.getHexString())){
+		p2.material.color.set(gameInfo.p2Color.toLowerCase());
+	}
+	if (gameInfo.goal1Color.toLowerCase() != ("#"+goal1.material.color.getHexString())){
+		goal1.material.color.set(gameInfo.goal1Color.toLowerCase());
+	}
+	if (gameInfo.goal2Color.toLowerCase() != ("#"+goal2.material.color.getHexString())){
+		goal2.material.color.set(gameInfo.goal2Color.toLowerCase());
+	}
+	if (gameInfo.ballColor.toLowerCase() != ("#"+ball.material.color.getHexString())){
+		ball.material.color.set(gameInfo.ballColor.toLowerCase());
+	}
+	if (gameInfo.gameBoardColor.toLowerCase() != ("#"+gameBoard.material.color.getHexString())){
+		gameBoard.material.color.set(gameInfo.gameBoardColor.toLowerCase());
+	}
+}
+
+function materialChanges(){
+
+	var loader = new THREE.TextureLoader();
+	loader.setCrossOrigin("anonymous");
+
+	if (gameInfo.p1Texture != gameInfo.lastP1Texture){
+		p1.material = new THREE.MeshLambertMaterial({color: p1.material.color, map: loader.load(gameInfo.p1Texture), side: THREE.DoubleSide});
+		gameInfo.lastP1Texture = gameInfo.p1Texture;
+	}
+	if (gameInfo.p2Texture != gameInfo.lastP2Texture){
+		p2.material = new THREE.MeshLambertMaterial({color: p2.material.color, map: loader.load(gameInfo.p2Texture), side: THREE.DoubleSide});
+		gameInfo.lastP2Texture = gameInfo.p2Texture;
+	}
+	if (gameInfo.goal1Texture != gameInfo.lastGoal1Texture){
+		goal1.material = new THREE.MeshLambertMaterial({color: goal1.material.color, map: loader.load(gameInfo.goal1Texture), side: THREE.DoubleSide});
+		gameInfo.lastGoal1Texture = gameInfo.goal1Texture;
+	}
+	if (gameInfo.goal2Texture != gameInfo.lastGoal2Texture){
+		goal2.material = new THREE.MeshLambertMaterial({color: goal2.material.color, map: loader.load(gameInfo.goal2Texture), side: THREE.DoubleSide});
+		gameInfo.lastGoal2Texture = gameInfo.goal2Texture;
+	}
+	if (gameInfo.ballTexture != gameInfo.lastBallTexture){
+		ball.material = new THREE.MeshLambertMaterial({color: ball.material.color, map: loader.load(gameInfo.ballTexture), side: THREE.DoubleSide});
+		gameInfo.lastBallTexture = gameInfo.ballTexture;
+	}
+	if (gameInfo.gameBoardTexture != gameInfo.lastGameBoardTexture){
+		gameBoard.material = new THREE.MeshLambertMaterial({color: gameBoard.material.color, map: loader.load(gameInfo.gameBoardTexture), side: THREE.DoubleSide});
+		gameInfo.lastGameBoardTexture = gameInfo.gameBoardTexture;
+	}
+}
+
 function animate() {
 	requestAnimationFrame( animate );
 
@@ -454,24 +515,11 @@ function animate() {
 		if (gameInfo.camera != 'none'){
 			renderer.render(scene, gameInfo.camera);
 		}
-		if (gameInfo.p1Color.toLowerCase() != ("#"+p1.material.color.getHexString())){
-			p1.material.color.set(gameInfo.p1Color.toLowerCase());
-		}
-		if (gameInfo.p2Color.toLowerCase() != ("#"+p2.material.color.getHexString())){
-			p2.material.color.set(gameInfo.p2Color.toLowerCase());
-		}
-		if (gameInfo.goal1Color.toLowerCase() != ("#"+goal1.material.color.getHexString())){
-			goal1.material.color.set(gameInfo.goal1Color.toLowerCase());
-		}
-		if (gameInfo.goal2Color.toLowerCase() != ("#"+goal2.material.color.getHexString())){
-			goal2.material.color.set(gameInfo.goal2Color.toLowerCase());
-		}
-		if (gameInfo.ballColor.toLowerCase() != ("#"+ball.material.color.getHexString())){
-			ball.material.color.set(gameInfo.ballColor.toLowerCase());
-		}
 		controlsHandling();
 		outOfBoundsHandling();
 		checkScore();
+		colorChanges();
+		materialChanges();
 		var info = document.getElementById("info");
 		info.innerHTML = '<div style="color: white; font-size:24pt; text-align: center; font-family: GameFont, sans-serif;">Blue Score: ' + gameInfo.p1Score + ' Red Score: '+ gameInfo.p2Score + '<br>Coded with <3 by Team 10</div>';
 		break;
