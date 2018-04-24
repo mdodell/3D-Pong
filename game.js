@@ -14,13 +14,16 @@ var ball; //The ball
 
 var offsetVec1; //Vector for handling cameras
 
-var side1, side2, goal1, goal2, gameBoard, gameCeiling; //Game borders
+var topSide, bottomSide, goal1, goal2, gameBoard, gameCeiling; //Game borders
 
 var introScene, introCamera, introText; //Intro objects
 
 var endScene, endCamera, endText; //End objects
 
 var gui; //A dat.gui
+
+var ballXVelocity=0;
+var ballZVelocity=0; //ball velocity variables
 
 
 
@@ -125,17 +128,17 @@ var controls =
 		gameCeiling.position.set(0,5,0);
 		gameCeiling.rotation.set(Math.PI/2,0,0);
 
-		side1 = boxMesh(200,20,1, 0xffffff);
-		side1 = new Physijs.BoxMesh(side1.geometry, side1.material,0);
-		scene.add(side1);
-		side1.__dirtyPosition = true;
-		side1.position.set(0,10,-50);
+		topSide = boxMesh(200,20,1, 0xffffff);
+		topSide = new Physijs.BoxMesh(topSide.geometry, topSide.material,0);
+		scene.add(topSide);
+		topSide.__dirtyPosition = true;
+		topSide.position.set(0,10,-50);
 
-		side2 = boxMesh(200,20,1, 0xffffff);
-		side2 = new Physijs.BoxMesh(side2.geometry, side2.material,0);
-		scene.add(side2);
-		side2.__dirtyPosition = true;
-		side2.position.set(0,10,50);
+		bottomSide = boxMesh(200,20,1, 0xffffff);
+		bottomSide = new Physijs.BoxMesh(bottomSide.geometry, bottomSide.material,0);
+		scene.add(bottomSide);
+		bottomSide.__dirtyPosition = true;
+		bottomSide.position.set(0,10,50);
 
 		// Blue side goal
 		goal1 = boxMesh(1,20,100, 0xff00ff);
@@ -201,16 +204,41 @@ function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 	if (other_object==p1 || other_object==p2){
 		console.log("ball hit the paddle");
 		soundEffect(`${getRandomIntInclusive(1,15)}.wav`);
+
 	}
-	if (other_object==side1 || other_object==side2){
+	if (other_object==topSide){
 		console.log("ball hit the side");
 		soundEffect(`${getRandomIntInclusive(1,15)}.wav`);
+		if (ballZVelocity<0){
+
+		} else {
+			console.log("Reversing Z velocity! Z Velocity is currently " + ballZVelocity);
+			ballZVelocity*=-10
+			ball.setLinearVelocity(new THREE.Vector3(ballXVelocity,0,ballZVelocity));
+			console.log("Reversed Z velocity is " + ballZVelocity);
+		}
+
+
+	}
+	if (other_object==bottomSide){
+		soundEffect(`${getRandomIntInclusive(1,15)}.wav`);
+		// if (ballZVelocity>0){
+		// 	console.log("Reversing X velocity! X Velocity is currently " + ballXVelocity);
+		// 	ballZVelocity*=-1
+		// 	ball.setLinearVelocity(new THREE.Vector3(ballXVelocity,0,ballZVelocity));
+		// 	console.log("Reveresed X velocity is " + ballXVelocity);
+		// } else if (ballZVelocity<0){
+		// 	console.log("Reversing X velocity! X Velocity is currently " + ballXVelocity);
+		// //	ballZVelocity*=-1
+		// 	ball.setLinearVelocity(new THREE.Vector3(ballXVelocity,0,ballZVelocity));
+		// 	console.log("Reversed X velocity is " + ballXVelocity);
+		// }
 	}
 	if (other_object==goal1){
 		console.log("ball hit the goal 1");
 		soundEffect('good.wav');
 		ball.__dirtyPosition = true;
-		ball.setLinearVelocity(new THREE.Vector3(0,0,0));
+		ball.setLinearVelocity(new THREE.Vector3(randomizeXVelocity(),0,randomizeZVelocity()));
 		ball.position.set(0, 2.5, 0);
 		gameInfo.p1Score += 1;
 	}
@@ -218,7 +246,7 @@ function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 		console.log("ball hit the goal 2");
 		soundEffect('good.wav');
 		ball.__dirtyPosition = true;
-		ball.setLinearVelocity(new THREE.Vector3(0,0,0));
+		ball.setLinearVelocity(new THREE.Vector3(randomizeXVelocity(),0,randomizeZVelocity()));
 		ball.position.set(0, 2.5, 0);
 		gameInfo.p2Score += 1;
 	}
@@ -266,6 +294,26 @@ function initScene(){
 function initPhysijs(){
 	Physijs.scripts.worker = './physijs_worker.js';
 	Physijs.scripts.ammo = './ammo.js';
+}
+
+function randomizeXVelocity(){
+	ballXVelocity = Math.floor((Math.random()*100)-50);
+	if (ballXVelocity==0 || ballXVelocity>-40 && ballXVelocity<40){
+		return randomizeXVelocity();
+	} else {
+		console.log("BallXVelocity is " + ballXVelocity);
+		return ballXVelocity;
+	}
+}
+
+function randomizeZVelocity(){
+	ballZVelocity = Math.floor((Math.random()*100)-50);
+	if (ballZVelocity==0 || ballZVelocity>-40 && ballZVelocity<40 ){
+		return randomizeZVelocity();
+	} else {
+		console.log("BallZVelocity is " + ballZVelocity);
+		return ballZVelocity;
+	}
 }
 
 function initRenderer(){
