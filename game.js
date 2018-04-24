@@ -206,34 +206,11 @@ function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 		soundEffect(`${getRandomIntInclusive(1,15)}.wav`);
 
 	}
-	if (other_object==topSide){
+	if (other_object==topSide || other_object==bottomSide){
 		console.log("ball hit the side");
 		soundEffect(`${getRandomIntInclusive(1,15)}.wav`);
-		if (ballZVelocity<0){
-
-		} else {
-			console.log("Reversing Z velocity! Z Velocity is currently " + ballZVelocity);
-			ballZVelocity*=-10
-			ball.setLinearVelocity(new THREE.Vector3(ballXVelocity,0,ballZVelocity));
-			console.log("Reversed Z velocity is " + ballZVelocity);
-		}
-
-
 	}
-	if (other_object==bottomSide){
-		soundEffect(`${getRandomIntInclusive(1,15)}.wav`);
-		// if (ballZVelocity>0){
-		// 	console.log("Reversing X velocity! X Velocity is currently " + ballXVelocity);
-		// 	ballZVelocity*=-1
-		// 	ball.setLinearVelocity(new THREE.Vector3(ballXVelocity,0,ballZVelocity));
-		// 	console.log("Reveresed X velocity is " + ballXVelocity);
-		// } else if (ballZVelocity<0){
-		// 	console.log("Reversing X velocity! X Velocity is currently " + ballXVelocity);
-		// //	ballZVelocity*=-1
-		// 	ball.setLinearVelocity(new THREE.Vector3(ballXVelocity,0,ballZVelocity));
-		// 	console.log("Reversed X velocity is " + ballXVelocity);
-		// }
-	}
+
 	if (other_object==goal1){
 		console.log("ball hit the goal 1");
 		soundEffect('good.wav');
