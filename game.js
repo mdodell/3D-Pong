@@ -25,6 +25,12 @@ var gui; //A dat.gui
 var ballXVelocity=0;
 var ballZVelocity=0; //ball velocity variables
 
+var clock;
+var deltaTime;
+
+var particleSystem;
+
+
 
 
 var controls =
@@ -50,6 +56,10 @@ var controls =
 		introCamera.position.set(0,0,-0.73);
 		introCamera.rotation.y = Math.PI;
 		introCamera.lookAt(0,0,0);
+
+				particleSystem = createParticleSystem("images/snowflake.png");
+				introScene.add(particleSystem);
+
 	}
 
 	function createEndScene(p1Won){
@@ -58,9 +68,13 @@ var controls =
 		gameInfo.scene='end';
 		if(p1Won){
 			endText = createImageMesh('p1win.png');
+			particleSystem = createParticleSystem("images/snowflake-blue.png");
+			endScene.add(particleSystem);
 		}
 		else{
 			endText = createImageMesh('p2win.png');
+			particleSystem = createParticleSystem("images/snowflake-red.png");
+			endScene.add(particleSystem);
 		}
 		soundEffect('win.wav');
 		endScene.add(endText);
@@ -71,10 +85,12 @@ var controls =
 		endCamera.position.set(0,0,-0.73);
 		endCamera.rotation.y = Math.PI;
 		endCamera.lookAt(0,0,0);
+
 	}
 
 	function init(){
 		initPhysijs();
+		clock = new THREE.Clock(true);
 		scene = createIntroScene();
 		initRenderer();
 	}
@@ -355,7 +371,7 @@ function keydown(event){
 	if(keys['l'] && keys['k']){
 		controls.p2RightDownDiag = true;
 	}
-	
+
 	switch (event.key){
 		case "p": scene = initScene(); createMainScene(); soundEffect('menuselect.wav'); console.log("Scene changed..."); break;
 		case "1": gameInfo.camera = p1Camera; break;
@@ -463,6 +479,59 @@ function createBall(){
 	mesh.setCcdMotionThreshold(200);
 	mesh.setCcdSweptSphereRadius(100);
 	return mesh;
+}
+
+function createParticleSystem(matName) {
+
+	// The number of particles in a particle system is not easily changed.
+    var particleCount = 2000;
+
+    // Particles are just individual vertices in a geometry
+    // Create the geometry that will hold all of the vertices
+    var particles = new THREE.Geometry();
+
+	// Create the vertices and add them to the particles geometry
+	for (var p = 0; p < particleCount; p++) {
+
+		// This will create all the vertices in a range of -200 to 200 in all directions
+		var x = Math.random() * 400 - 200;
+		var y = Math.random() * 400 - 200;
+		var z = Math.random() * 400 - 200;
+
+		// Create the vertex
+		var particle = new THREE.Vector3(x, y, z);
+
+		// Add the vertex to the geometry
+		particles.vertices.push(particle);
+	}
+
+	// Create the material that will be used to render each vertex of the geometry
+	var particleMaterial = new THREE.PointsMaterial(
+			{color: 0xffffff,
+			 size: 4,
+			 map: THREE.ImageUtils.loadTexture(matName),
+			 blending: THREE.AdditiveBlending,
+			 transparent: true,
+			});
+
+	// Create the particle system
+	particleSystem = new THREE.Points(particles, particleMaterial);
+
+	return particleSystem;
+}
+
+function animateParticles() {
+	var verts = particleSystem.geometry.vertices;
+	for(var i = 0; i < verts.length; i++) {
+		var vert = verts[i];
+		if (vert.y < -200) {
+			vert.y = Math.random() * 400 - 200;
+		}
+		vert.y = vert.y - (10 * deltaTime);
+	}
+	particleSystem.geometry.verticesNeedUpdate = true;
+
+	particleSystem.rotation.y -= .1 * deltaTime;
 }
 
 function controlsHandling(){
@@ -631,9 +700,11 @@ function materialChanges(){
 
 function animate() {
 	requestAnimationFrame( animate );
+	deltaTime = clock.getDelta();
 
 	switch(gameInfo.scene) {
 		case "intro":
+		animateParticles();
 		renderer.render(introScene, introCamera);
 		break;
 
@@ -654,6 +725,7 @@ function animate() {
 		break;
 
 		case "end":
+		animateParticles();
 		renderer.render(endScene, endCamera);
 		break;
 
