@@ -320,12 +320,47 @@ function initControls(){
 	window.addEventListener('keyup', keyup);
 }
 
+var keys = [];
 function keydown(event){
+	console.log(event.key)
+	console.log(keys)
+	keys[event.key] = true;
+
+	//P1 Controls
+	if(keys['w'] && keys['d']){
+		controls.p1RightUpDiag = true;
+	}
+
+	if(keys['s'] && keys['d']){
+		controls.p1RightDownDiag = true;
+	}
+
+	if(keys['w'] && keys['a']){
+		controls.p1LeftUpDiag = true;
+	}
+	if(keys['a'] && keys['s']){
+		controls.p1LeftDownDiag = true;
+	}
+
+	//P2 Controls
+	if(keys['i'] && keys['j']){
+		controls.p2LeftUpDiag = true;
+	}
+	if(keys['k'] && keys['j']){
+		controls.p2LeftDownDiag = true;
+	}
+	if(keys['i'] && keys['l']){
+		controls.p2RightUpDiag = true;
+	}
+	if(keys['l'] && keys['k']){
+		controls.p2RightDownDiag = true;
+	}
+	
 	switch (event.key){
 		case "p": scene = initScene(); createMainScene(); soundEffect('menuselect.wav'); console.log("Scene changed..."); break;
 		case "1": gameInfo.camera = p1Camera; break;
 		case "2": gameInfo.camera = p2Camera; break;
-		case "3": gameInfo.camera = camera; break
+		case "3": gameInfo.camera = camera; break;
 
 		// Player 1 controls
 		case "d": controls.p1Left = true; break;
@@ -339,9 +374,14 @@ function keydown(event){
 		case "k": controls.p2Fwd = true; break;
 		case "i": controls.p2Bwd = true; break;
 	}
+
 }
 
 function keyup(event){
+	keys[event.key] = false;
+	//P1 Diagonal Controls
+
+
 	switch (event.key){
 		// Player 1 controls
 		case "d": controls.p1Left = false; p1.setLinearVelocity(new THREE.Vector3(0, p1.getWorldDirection().y, p1.getWorldDirection().z)); break;
@@ -354,6 +394,33 @@ function keyup(event){
 		case "l": controls.p2Right = false; p2.setLinearVelocity(new THREE.Vector3(0, p2.getWorldDirection().y, p2.getWorldDirection().z)); break;
 		case "k": controls.p2Fwd = false; p2.setLinearVelocity(new THREE.Vector3(p2.getWorldDirection().x, p2.getWorldDirection().y, 0)); break;
 		case "i": controls.p2Bwd = false; p2.setLinearVelocity(new THREE.Vector3(p2.getWorldDirection().x, p2.getWorldDirection().y, 0)); break;
+	}
+	if((!keys['w'] || !keys['d']) || (!keys['w'] && !keys['d'])){
+		controls.p1RightUpDiag = false;
+		//p1.setLinearVelocity(new THREE.Vector3(p1.getWorldDirection().x, p1.getWorldDirection().y, p1.getWorldDirection().z));
+	}
+	if((!keys['s'] || !keys['d']) || (!keys['s'] && !keys['d'])){
+		controls.p1RightDownDiag = false;
+		//p1.setLinearVelocity(new THREE.Vector3(p1.getWorldDirection().x, p1.getWorldDirection().y, p1.getWorldDirection().z));
+	}
+	if((!keys['w'] || !keys['a']) || (!keys['w'] && !keys['a'])){
+		controls.p1LeftUpDiag = false;
+	}
+	if((!keys['a'] || !keys['s']) || (!keys['a'] && !keys['s'])){
+		controls.p1LeftDownDiag = false;
+	}
+	//P2 Diagonal Controls
+	if((!keys['i'] || !keys['j']) || (!keys['i'] && !keys['j'])){
+		controls.p2LeftUpDiag = false;
+	}
+	if((!keys['k'] || !keys['j']) || (!keys['k'] && !keys['j'])){
+		controls.p2LeftDownDiag = false;
+	}
+	if((!keys['i'] || !keys['l']) || (!keys['i'] && !keys['l'])){
+		controls.p2RightUpDiag = false;
+	}
+	if((!keys['l'] || !keys['k']) || (!keys['l'] && !keys['k'])){
+		controls.p2RightDownDiag = false;
 	}
 }
 
@@ -418,6 +485,24 @@ function controlsHandling(){
 			p1.setLinearVelocity(new THREE.Vector3(-p1Direction.x * controls.p1PaddleSpeed, p1Direction.y, p1Direction.z));
 		}
 	}
+	if(controls.p1RightUpDiag || controls.p1RightDownDiag){
+		p1Direction = new THREE.Vector3(p1Direction.x, p1Direction.y, 1);
+		if (controls.p1RightUpDiag){
+			p1.setLinearVelocity(new THREE.Vector3(p1Direction.x*controls.p1PaddleSpeed, p1Direction.y, -p1Direction.z * controls.p1PaddleSpeed));
+		}
+		else if (controls.p1RightDownDiag){
+			p1.setLinearVelocity(new THREE.Vector3(p1Direction.x*controls.p1PaddleSpeed, p1Direction.y, p1Direction.z * controls.p1PaddleSpeed));
+		}
+	}
+	if(controls.p1LeftUpDiag || controls.p1LeftDownDiag){
+		p1Direction = new THREE.Vector3(1,p1Direction.y, p1Direction.z);
+		if (controls.p1LeftUpDiag){
+			p1.setLinearVelocity(new THREE.Vector3(-p1Direction.x*controls.p1PaddleSpeed, p1Direction.y, -p1Direction.z * controls.p1PaddleSpeed));
+		}
+		else if (controls.p1LeftDownDiag){
+			p1.setLinearVelocity(new THREE.Vector3(-p1Direction.x*controls.p1PaddleSpeed, p1Direction.y, p1Direction.z * controls.p1PaddleSpeed));
+		}
+	}
 	p1.__dirtyRotation = true;
 	p1.rotation.set(0, 0, 0);
 
@@ -440,8 +525,27 @@ function controlsHandling(){
 			p2.setLinearVelocity(new THREE.Vector3(p2Direction.x * controls.p2PaddleSpeed, p2Direction.y, p2Direction.z));
 		}
 	}
+	if(controls.p2RightUpDiag || controls.p2RightDownDiag){
+		p1Direction = new THREE.Vector3(p2Direction.x, p2Direction.y, 1);
+		if (controls.p2RightUpDiag){
+			p2.setLinearVelocity(new THREE.Vector3(p2Direction.x*controls.p2PaddleSpeed, p2Direction.y, -p2Direction.z * controls.p2PaddleSpeed));
+		}
+		else if (controls.p2RightDownDiag){
+			p2.setLinearVelocity(new THREE.Vector3(p2Direction.x*controls.p2PaddleSpeed, p2Direction.y, p2Direction.z * controls.p2PaddleSpeed));
+		}
+	}
+	if(controls.p2LeftUpDiag || controls.p2LeftDownDiag){
+		p1Direction = new THREE.Vector3(1,p2Direction.y, p2Direction.z);
+		if (controls.p2LeftUpDiag){
+			p2.setLinearVelocity(new THREE.Vector3(-p2Direction.x*controls.p2PaddleSpeed, p2Direction.y, -p2Direction.z * controls.p2PaddleSpeed));
+		}
+		else if (controls.p2LeftDownDiag){
+			p2.setLinearVelocity(new THREE.Vector3(-p2Direction.x*controls.p2PaddleSpeed, p2Direction.y, p2Direction.z * controls.p2PaddleSpeed));
+		}
+	}
 	p2.__dirtyRotation = true;
 	p2.rotation.set(0, 0, 0);
+
 }
 
 function outOfBoundsHandling(){
