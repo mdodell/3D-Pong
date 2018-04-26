@@ -224,6 +224,7 @@ function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 	}
 	if (other_object==topSide || other_object==bottomSide){
 		console.log("ball hit the side");
+		ball.setLinearVelocity(new THREE.Vector3(ball.getWorldDirection().x,ball.getWorldDirection().y,-ball.getWorldDirection().z));
 		soundEffect(`${getRandomIntInclusive(1,15)}.wav`);
 	}
 
