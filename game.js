@@ -224,7 +224,7 @@ function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 	}
 	if (other_object==topSide || other_object==bottomSide){
 		console.log("ball hit the side");
-		ball.setLinearVelocity(new THREE.Vector3(ball.getWorldDirection().x,ball.getWorldDirection().y,-ball.getWorldDirection().z));
+		//ball.setLinearVelocity(new THREE.Vector3(ball.getWorldDirection().x,ball.getWorldDirection().y,-ball.getWorldDirection().z));
 		soundEffect(`${getRandomIntInclusive(1,15)}.wav`);
 	}
 
@@ -232,7 +232,7 @@ function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 		console.log("ball hit the goal 1");
 		soundEffect('good.wav');
 		ball.__dirtyPosition = true;
-		ball.setLinearVelocity(new THREE.Vector3(randomizeXVelocity(),0,randomizeZVelocity()));
+		//ball.setLinearVelocity(new THREE.Vector3(randomizeXVelocity(),0,randomizeZVelocity()));
 		ball.position.set(0, 2.5, 0);
 		gameInfo.p1Score += 1;
 	}
@@ -240,7 +240,7 @@ function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 		console.log("ball hit the goal 2");
 		soundEffect('good.wav');
 		ball.__dirtyPosition = true;
-		ball.setLinearVelocity(new THREE.Vector3(randomizeXVelocity(),0,randomizeZVelocity()));
+		//ball.setLinearVelocity(new THREE.Vector3(randomizeXVelocity(),0,randomizeZVelocity()));
 		ball.position.set(0, 2.5, 0);
 		gameInfo.p2Score += 1;
 	}
