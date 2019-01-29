@@ -6,7 +6,7 @@ A final project for our CS155b course, Computer Graphics!
 ## Play options
 
 ### In browser
-Play here: https://mdodell.github.io/cs155b_PA03/game.html
+Play here: https://mdodell.github.io/3D-Pong/game.html
 
 ### Download and run
 Clone it above and run with a web server!
